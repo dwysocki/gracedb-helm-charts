@@ -10,8 +10,9 @@ variables:
 # if the chart is modified
 helm:lint:
   stage: build
-  image: alpine/helm:3.7.1
-  entrypoint: [""] 
+  image: 
+    name: alpine/helm:3.7.1
+    entrypoint: [""] 
   script:
     - helm lint hopskotch
   rules:
@@ -22,20 +23,20 @@ helm:lint:
 # These steps build the Helm chart package
 # and upload it to the helm-charts repo
 # only when a tag is created
-helm:build:
-  stage: build
-  image: alpine/helm:3.7.1
-  entrypoint: [""] 
-  script:
-    - helm package hopskotch --version ${CI_COMMIT_TAG}
-  artifacts:
-    paths:
-      - hopskotch-${CI_COMMIT_TAG}.tgz
-  only:
-    - tags
-  needs:
-    - job: helm:lint
-      optional: true
+#helm:build:
+#  stage: build
+#  image: alpine/helm:3.7.1
+#  entrypoint: [""] 
+#  script:
+#    - helm package hopskotch --version ${CI_COMMIT_TAG}
+#  artifacts:
+#    paths:
+#      - hopskotch-${CI_COMMIT_TAG}.tgz
+#  only:
+#    - tags
+#  needs:
+#    - job: helm:lint
+#      optional: true
 
 #helm:publish:
 #  stage: publish
