@@ -4,7 +4,6 @@ stages:
   - publish
 
 variables:
-  #RUNNER_TAG: k8s-cnaf
   HELM_REPO_CHANNEL: "stable"
 
 # Execute lint checks
@@ -14,8 +13,6 @@ helm:lint:
   image: alpine/helm:3.7.1
   script:
     - helm lint hopskotch
-#  tags:
-#    - $RUNNER_TAG
   rules:
     - changes:
         - hopskotch/*
@@ -37,8 +34,6 @@ helm:build:
   needs:
     - job: helm:lint
       optional: true
-#  tags:
-#    - $RUNNER_TAG
 
 #helm:publish:
 #  stage: publish
@@ -71,5 +66,3 @@ helm:upload:
     - tags
   needs:
     - job: helm:build
-#  tags:
-#    - $RUNNER_TAG
