@@ -62,11 +62,13 @@ helm:upload:
   script:
     - git config --global user.email "${GITLAB_USER_EMAIL}"
     - git config --global user.name "${GITLAB_USER_NAME}"
+    - git clone "https://${GITLAB_USERNAME}:${GITLAB_TOKEN}@${CI_SERVER_HOST}/${CI_PROJECT_PATH}.git" "${CI_COMMIT_SHA}"
+    - cd ${CI_COMMIT_SHA}
     - mkdir -p packages
-    - cp hopskotch-${CI_COMMIT_TAG}.tgz packages/hopskotch-${CI_COMMIT_TAG}.tgz
+    - cp ../hopskotch-${CI_COMMIT_TAG}.tgz packages/hopskotch-${CI_COMMIT_TAG}.tgz
     - git add packages/hopskotch-${CI_COMMIT_TAG}.tgz
     - git commit -m "Added hopskotch package ${CI_COMMIT_TAG}"
-    - git push origin HEAD:${CI_COMMIT_REF_NAME}
+    - git push 
   only:
     - tags
   needs:
