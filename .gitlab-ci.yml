@@ -1,5 +1,4 @@
 stages:
-  - test
   - build
   - publish
 
@@ -39,36 +38,15 @@ helm:build:
     - job: helm:lint
       optional: true
 
-#helm:publish:
-#  stage: publish
-#  image: alpine/curl:latest
-#  variables:
-#    HELM_REPO_API: https://git.ligo.org/api/v4/projects/${HELM_REPO_PROJECT_ID}/packages/helm/api/${HELM_REPO_CHANNEL}/charts
-#  script:
-#    - curl -f --request POST --form "chart=@hopskotch-${CI_COMMIT_TAG}.tgz" --user ${GITLAB_USER_ID}:${HELM_REPO_TOKEN} ${HELM_REPO_API}
-#  only:
-#    - tags
-#  needs:
-#    - vault:get_repo_token
-#    - job: helm:build
-#  tags:
-#    - $RUNNER_TAG
-
-helm:upload:
+helm:publish:
   stage: publish
   image: 
-    name: alpine/git:latest
+    name: alpine/curl:latest
     entrypoint: [""]
+  variables:
   script:
-    - git config --global user.email "${GITLAB_USER_EMAIL}"
-    - git config --global user.name "${GITLAB_USER_NAME}"
-    - git clone "https://${GITLAB_USERNAME}:${GITLAB_TOKEN}@${CI_SERVER_HOST}/${CI_PROJECT_PATH}.git" "${CI_COMMIT_SHA}"
-    - cd ${CI_COMMIT_SHA}
-    - mkdir -p packages
-    - cp ../hopskotch-${CI_COMMIT_TAG}.tgz packages/hopskotch-${CI_COMMIT_TAG}.tgz
-    - git add packages/hopskotch-${CI_COMMIT_TAG}.tgz
-    - git commit -m "Added hopskotch package ${CI_COMMIT_TAG}"
-    - git push 
+    - curl -f --request POST --form "chart=@hopskotch-${CI_COMMIT_TAG}.tgz" --user ${GITLAB_USER_ID}:${HELM_REPO_TOKEN} ${HELM_REPO_API}
+    - curl --request POST --user gitlab-ci-token:$CI_JOB_TOKEN --form "chart=chart=@hopskotch-${CI_COMMIT_TAG}.tgz" "${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/packages/helm/api/${HELM_REPO_CHANNEL}/charts"
   only:
     - tags
   needs:
