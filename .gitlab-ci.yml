@@ -62,6 +62,7 @@ helm:upload:
   script:
     - git config --global user.email "${GITLAB_USER_EMAIL}"
     - git config --global user.name "${GITLAB_USER_NAME}"
+    - mkdir -p packages
     - cp hopskotch-${CI_COMMIT_TAG}.tgz packages/hopskotch-${CI_COMMIT_TAG}.tgz
     - git add packages/hopskotch-${CI_COMMIT_TAG}.tgz
     - git commit -m "Added hopskotch package ${CI_COMMIT_TAG}"
