@@ -54,19 +54,17 @@ helm:build:
 #  tags:
 #    - $RUNNER_TAG
 
-#helm:upload:
-#  stage: publish
-#  image: alpine/git:latest
-#  script:
-#    - git config --global user.email "${GITLAB_USER_EMAIL}"
-#    - git config --global user.name "${GITLAB_USER_NAME}"
-#    - git clone ${HELM_REPO} ${CI_COMMIT_SHA}
-#    - cd ${CI_COMMIT_SHA}
-#    - cp ../hopskotch-${CI_COMMIT_TAG}.tgz packages/hopskotch-${CI_COMMIT_TAG}.tgz
-#    - git add packages/hopskotch-${CI_COMMIT_TAG}.tgz
-#    - git commit -m "Added hopskotch package ${CI_COMMIT_TAG}"
-#    - git push
-#  only:
-#    - tags
-#  needs:
-#    - job: helm:build
+helm:upload:
+  stage: publish
+  image: alpine/git:latest
+  script:
+    - git config --global user.email "${GITLAB_USER_EMAIL}"
+    - git config --global user.name "${GITLAB_USER_NAME}"
+    - cp hopskotch-${CI_COMMIT_TAG}.tgz packages/hopskotch-${CI_COMMIT_TAG}.tgz
+    - git add packages/hopskotch-${CI_COMMIT_TAG}.tgz
+    - git commit -m "Added hopskotch package ${CI_COMMIT_TAG}"
+    - git push
+  only:
+    - tags
+  needs:
+    - job: helm:build
