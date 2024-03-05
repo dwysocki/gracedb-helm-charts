@@ -11,6 +11,7 @@ variables:
 helm:lint:
   stage: build
   image: alpine/helm:3.7.1
+  entrypoint: [""] 
   script:
     - helm lint hopskotch
   rules:
@@ -24,6 +25,7 @@ helm:lint:
 helm:build:
   stage: build
   image: alpine/helm:3.7.1
+  entrypoint: [""] 
   script:
     - helm package hopskotch --version ${CI_COMMIT_TAG}
   artifacts:
