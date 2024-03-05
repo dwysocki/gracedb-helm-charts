@@ -1,0 +1,49 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "hopskotch.fullname" . }}
+  labels:
+    {{- include "hopskotch.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.replicaCount | default 1 }}
+  selector:
+    matchLabels:
+      {{- include "hopskotch.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        {{- include "hopskotch.selectorLabels" . | nindent 8 }}
+    spec:
+      hostname: {{ include "hopskotch.fullname" . }}
+      containers:
+        - name: {{ .Chart.Name }}
+          image: "{{ .Values.image.repository | default "scimma/server" }}:{{ .Values.image.tag | default "latest" }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy | default "IfNotPresent" }}
+          {{ if not .Values.security }}
+          args: ["--noSecurity", "True", "--advertisedListener", "PLAINTEXT://{{ include "hopskotch.fullname" . }}:9092"]
+          {{ else }}
+          args: ["--advertisedListener", "PLAINTEXT://{{ include "hopskotch.fullname" . }}:9092"]
+          {{ end }}
+          ports:
+            - name: port1
+              containerPort: 9092
+              protocol: TCP
+          livenessProbe:
+            exec:
+              command: ["kcat","-L","-b","localhost:9092"]
+            initialDelaySeconds: 5
+            periodSeconds: 120 
+          readinessProbe:
+            exec:
+              command: ["kcat","-L","-b","localhost:9092"]
+            initialDelaySeconds: 5
+            periodSeconds: 5
+          resources:
+            {{- toYaml .Values.resources | nindent 12 | default "{}" }}
+          volumeMounts:
+          - name: data-dir
+            mountPath: /var/lib/zookeeper
+      volumes:
+        - name: data-dir
+          persistentVolumeClaim:
+            claimName: {{ include "hopskotch.fullname" . }}-persistence   

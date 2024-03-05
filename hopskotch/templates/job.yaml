@@ -1,0 +1,34 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: {{ include "hopskotch.fullname" . }}-create-topics
+  annotations:
+    "helm.sh/hook": post-install
+    "helm.sh/hook-weight": "0"
+    "helm.sh/hook-delete-policy": hook-succeeded
+spec:
+  template:
+    spec:
+      containers:
+      - name: create-topics
+        image: "{{ .Values.image.repository | default "scimma/server" }}:{{ .Values.image.tag | default "latest" }}"
+        imagePullPolicy: {{ .Values.image.pullPolicy | default "IfNotPresent" }}
+        command: 
+          - sh
+          - -c
+          - |
+            while read t; do
+              topic="{{ .Release.Namespace }}.$t"
+              bash -c "echo dummy | kcat -P -b {{ include "hopskotch.fullname" . }}:9092 -t $topic"
+            done < /tmp/topics.txt 
+        volumeMounts:
+          - name: topics-list
+            mountPath: /tmp/topics.txt
+            subPath: topics.txt
+      volumes:
+      - name: topics-list
+        configMap:
+          name: topics-list
+      restartPolicy: Never
+  backoffLimit: 10
+

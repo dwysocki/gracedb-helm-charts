@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ include "hopskotch.fullname" . }}-persistence
+spec:
+  storageClassName: {{ .Values.storageClassName | default  }}
+  accessModes:
+    - ReadWriteOnce
+  resources:
+   requests:
+     storage: {{ .Values.storageCapacity | default "10Gi" }}

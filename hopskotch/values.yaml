@@ -1,0 +1,21 @@
+# Default values for hopskotch.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+replicaCount: 1
+storageClassName: "standard"
+storageCapacity: 1Gi
+
+security: false
+
+image:
+  repository: scimma/server
+  pullPolicy: IfNotPresent
+  # Overrides the image tag whose default is the chart appVersion.
+  tag: "0.7"
+
+service:
+  type: LoadBalancer
+  externalIP: 192.168.49.2
+
+resources: {}

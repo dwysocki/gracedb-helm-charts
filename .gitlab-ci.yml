@@ -1,0 +1,75 @@
+stages:
+  - test
+  - build
+  - publish
+
+variables:
+  #RUNNER_TAG: k8s-cnaf
+  HELM_REPO_CHANNEL: "stable"
+
+# Execute lint checks
+# if the chart is modified
+helm:lint:
+  stage: build
+  image: alpine/helm:3.7.1
+  script:
+    - helm lint hopskotch
+#  tags:
+#    - $RUNNER_TAG
+  rules:
+    - changes:
+        - hopskotch/*
+    - when: never
+
+# These steps build the Helm chart package
+# and upload it to the helm-charts repo
+# only when a tag is created
+helm:build:
+  stage: build
+  image: alpine/helm:3.7.1
+  script:
+    - helm package hopskotch --version ${CI_COMMIT_TAG}
+  artifacts:
+    paths:
+      - hopskotch-${CI_COMMIT_TAG}.tgz
+  only:
+    - tags
+  needs:
+    - job: helm:lint
+      optional: true
+#  tags:
+#    - $RUNNER_TAG
+
+#helm:publish:
+#  stage: publish
+#  image: alpine/curl:latest
+#  variables:
+#    HELM_REPO_API: https://git.ligo.org/api/v4/projects/${HELM_REPO_PROJECT_ID}/packages/helm/api/${HELM_REPO_CHANNEL}/charts
+#  script:
+#    - curl -f --request POST --form "chart=@hopskotch-${CI_COMMIT_TAG}.tgz" --user ${GITLAB_USER_ID}:${HELM_REPO_TOKEN} ${HELM_REPO_API}
+#  only:
+#    - tags
+#  needs:
+#    - vault:get_repo_token
+#    - job: helm:build
+#  tags:
+#    - $RUNNER_TAG
+
+helm:upload:
+  stage: publish
+  image: alpine/git:latest
+  script:
+    - git config --global user.email "${GITLAB_USER_EMAIL}"
+    - git config --global user.name "${GITLAB_USER_NAME}"
+    - git clone ${HELM_REPO} ${CI_COMMIT_SHA}
+    - cd ${CI_COMMIT_SHA}
+    - cp ../hopskotch-${CI_COMMIT_TAG}.tgz packages/hopskotch-${CI_COMMIT_TAG}.tgz
+    - git add packages/hopskotch-${CI_COMMIT_TAG}.tgz
+    - git commit -m "Added hopskotch package ${CI_COMMIT_TAG}"
+    - git push
+  only:
+    - tags
+  needs:
+    - job: helm:build
+#  tags:
+#    - $RUNNER_TAG

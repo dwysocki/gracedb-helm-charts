@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: topics-list
+data:
+{{- range $path,$_ := .Files.Glob "files/topics.txt" }}
+{{ $path | base | indent 2 }}: |-
+{{ $.Files.Get $path | indent 4 }}
+{{- end }}
+
