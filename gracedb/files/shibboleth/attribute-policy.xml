@@ -1,0 +1,54 @@
+<afp:AttributeFilterPolicyGroup xmlns="urn:mace:shibboleth:2.0:afp:mf:basic"
+   xmlns:saml="urn:mace:shibboleth:2.0:afp:mf:saml"
+   xmlns:basic="urn:mace:shibboleth:2.0:afp:mf:basic"
+   xmlns:afp="urn:mace:shibboleth:2.0:afp"
+   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+   <afp:PermitValueRule id="ScopingRules" xsi:type="AND">
+      <Rule xsi:type="NOT">
+         <Rule xsi:type="AttributeValueRegex" regex="@"/>
+      </Rule>
+
+      <Rule xsi:type="saml:AttributeScopeMatchesShibMDScope"/>
+   </afp:PermitValueRule>
+
+   <afp:AttributeFilterPolicy>
+      <afp:PolicyRequirementRule xsi:type="ANY"/>
+
+      <afp:AttributeRule attributeID="eppn">
+         <afp:PermitValueRuleReference ref="ScopingRules"/>
+      </afp:AttributeRule>
+
+      <afp:AttributeRule attributeID="Meta-displayName">
+         <afp:PermitValueRule xsi:type="ANY"/>
+      </afp:AttributeRule>
+
+      <afp:AttributeRule attributeID="Meta-errorURL">
+         <afp:PermitValueRule xsi:type="ANY"/>
+      </afp:AttributeRule>
+   </afp:AttributeFilterPolicy>
+
+   <!-- Rules for gw-astronomy AA -->
+   <afp:AttributeFilterPolicy>
+      <afp:PolicyRequirementRule xsi:type="basic:AttributeIssuerString"
+         value="https://aa.gw-astronomy.org/aa/shibboleth"/>
+
+      <afp:AttributeRule attributeID="mail">
+         <afp:PermitValueRule xsi:type="ANY"/>
+      </afp:AttributeRule>
+
+      <afp:AttributeRule attributeID="isMemberOf">
+         <afp:PermitValueRule xsi:type="ANY"/>
+      </afp:AttributeRule>
+   </afp:AttributeFilterPolicy>
+
+   <!-- Rules for LIGO IdPs -->
+   <afp:AttributeFilterPolicy>
+      <afp:PolicyRequirementRule xsi:type="basic:AttributeIssuerRegex"
+         regex="https://login.*\.ligo\.org/idp/shibboleth"/>
+
+      <!-- Pass everything through -->
+      <afp:AttributeRule attributeID="*">
+         <afp:PermitValueRule xsi:type="ANY"/>
+      </afp:AttributeRule>
+   </afp:AttributeFilterPolicy>
+</afp:AttributeFilterPolicyGroup>

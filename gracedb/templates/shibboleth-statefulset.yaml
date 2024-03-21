@@ -1,0 +1,162 @@
+{{ if not .Values.sandboxed.enabled }}
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: {{ include "gracedb.fullname" . }}-shibd
+spec:
+  serviceName: {{ include "gracedb.fullname" . }}-shibd
+  {{ if .Values.distributed.enabled }}
+  replicas: {{ .Values.gracedb.replicaCount }}
+  {{ else }}
+  replicas: 1
+  {{ end }}
+  selector:
+    matchLabels:
+      app: {{ include "gracedb.fullname" . }}-shibd
+  template:
+    metadata:
+      labels:
+        app: {{ include "gracedb.fullname" . }}-shibd
+    spec:
+      hostname: {{ include "gracedb.fullname" . }}-shibd
+      containers:
+        - name: {{ include "gracedb.fullname" . }}-shibd
+          resources:
+            requests:
+              cpu: 2
+              memory: 6Gi
+            limits:
+              cpu: 2
+              memory: 6Gi
+          image: {{ .Values.gracedb.image }}
+          envFrom:
+          - configMapRef:
+              name: env
+          - secretRef:
+              name: {{ include "gracedb.fullname" . }}-postgres
+          - secretRef:
+              name: {{ include "gracedb.fullname" . }}
+          - secretRef:
+              name: igwn-alert-credentials
+          env:
+            - name: ENABLE_SHIBD
+              value: "true"
+            - name: ENABLE_IGWN_OVERSEER
+              value: "false"
+            - name: DJANGO_PRIMARY_FQDN
+              value: {{ .Values.publicName }}
+            - name: DJANGO_DB_HOST
+              {{ if .Values.distributed.enabled }}
+              value: {{ include "gracedb.fullname" . }}-postgresql-primary.{{ .Release.Namespace }}
+              {{ else }}
+              value: {{ include "gracedb.fullname" . }}-postgres
+              {{ end }}
+          volumeMounts:
+            - name: igwn-alert-supervisor
+              mountPath: /etc/supervisor/conf.d/igwn-overseer.conf
+              subPath: igwn-overseer.conf
+            - name: django-base-settings
+              mountPath: /app/gracedb_project/config/settings/container/base.py
+              subPath: base.py
+            - name: django-settings
+              mountPath: /app/gracedb_project/config/settings/container/{{ .Values.tier.instance }}.py
+              subPath: {{ .Values.tier.instance}}.py
+            - name: shibd-cache
+              mountPath: "/var/cache/shibboleth"
+            - name: read-write-configs
+              mountPath: /etc/shibboleth-ds/idpselect_config.js
+              subPath: idpselect_config.js
+            - name: read-write-configs
+              mountPath: /etc/shibboleth/shibboleth2.xml
+              subPath: shibboleth2.xml
+            - name: read-write-configs
+              mountPath: /etc/shibboleth/attrChecker-gracedb.html
+              subPath: attrChecker-gracedb.html
+            - name: read-write-configs
+              mountPath: /etc/shibboleth/attribute-map.xml
+              subPath: attribute-map.xml
+            - name: read-write-configs
+              mountPath: /etc/shibboleth/attribute-policy.xml
+              subPath: attribute-policy.xml
+            - name: read-write-configs
+              mountPath: /etc/shibboleth/sp-cert.pem
+              subPath: sp-cert.pem
+            - name: read-write-configs
+              mountPath: /etc/shibboleth/sp-key.pem
+              subPath: sp-key.pem
+          livenessProbe:
+            exec:
+              command:
+                - python3
+                - /usr/local/bin/check_shibboleth_status
+            failureThreshold: 2
+            initialDelaySeconds: 1000
+            periodSeconds: 10
+          readinessProbe:
+            exec:
+              command:
+                - python3
+                - /usr/local/bin/check_shibboleth_status
+            initialDelaySeconds: 5
+            periodSeconds: 5
+      initContainers:
+        - name: shibd-init
+          image: {{ .Values.gracedb.image }}
+          command:
+            - sh
+            - -c
+            - |
+              /bin/cp -a /read-only-configs/. /read-write-configs &&
+              /bin/chown _shibd:_shibd /read-write-configs/sp-cert.pem &&
+              /bin/chown _shibd:_shibd /read-write-configs/sp-key.pem &&
+              /bin/chown _shibd:_shibd /var/cache/shibboleth &&
+              /bin/chown _shibd:www-data /read-write-configs/shibboleth2.xml
+              #/bin/chown _shibd:www-data /read-write-configs/shibboleth2.xml &&
+              #find /var/cache/shibboleth -type f -name '*.json' -mtime '+3' -delete
+          securityContext:
+            runAsUser: 0
+          volumeMounts:
+            - name: shibboleth
+              mountPath: /read-only-configs
+              readOnly: true
+            - name: read-write-configs
+              mountPath: /read-write-configs
+            - name: shibd-cache
+              mountPath: /var/cache/shibboleth
+      volumes:
+        - name: igwn-alert-supervisor
+          configMap:
+              name: igwn-alert-supervisor
+        - name: django-base-settings
+          configMap:
+              name: django-base-settings
+        - name: django-settings
+          configMap:
+              name: django-settings
+        - name: shibboleth
+          projected:
+            sources:
+              - configMap:
+                  name: shibboleth-configs
+              - secret:
+                  name: shibboleth-key
+                  items:
+                    - key: sp-key.pem
+                      path: sp-key.pem
+                      mode: 0600
+                    - key: sp-cert.pem
+                      path: sp-cert.pem
+                      mode: 0600
+        - name: read-write-configs
+          emptyDir: {}
+  volumeClaimTemplates:
+    - metadata:
+        name: shibd-cache
+      spec:
+        accessModes:
+          - ReadWriteOnce
+        resources:
+          requests:
+            storage: 1Gi
+        storageClassName: {{ .Values.storageClassName }}
+{{ end }}

@@ -1,0 +1,18 @@
+{{- if and (.Values.cert_manager.enabled) (not .Values.cert_manager.issuer) }}
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: &name {{ template "gracedb.fullname" . }}-ca
+  annotations:
+    "helm.sh/hook": post-install,post-upgrade
+    "helm.sh/hook-weight": "2"
+spec:
+  isCA: true
+  commonName: igwn-ll-dev-ca
+  secretName: *name
+  privateKey:
+    algorithm: ECDSA
+    size: 256
+  issuerRef:
+    name: {{ template "gracedb.fullname" . }}-selfsigned
+{{- end }}

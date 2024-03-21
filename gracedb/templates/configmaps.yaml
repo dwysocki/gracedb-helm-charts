@@ -1,0 +1,154 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: django-base-settings
+data:
+{{- $path := (print "files/django/base.py") }}
+{{ $path | base | indent 2 }}: |-
+{{ $.Files.Get $path | indent 4 }}
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: django-settings
+data:
+{{- $path := (print "files/django/generic-test.py") }}
+{{ $path | base | indent 2 }}: |-
+{{ $.Files.Get $path | indent 4 }}
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: django-update-site
+data:
+{{- range $path,$_ := .Files.Glob "files/django/0002_update_site.py" }}
+{{ $path | base | indent 2 }}: |-
+{{ $.Files.Get $path | indent 4 }}
+{{- end }}
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: igwn-alert-overseer
+data:
+{{- $path := (print "files/igwn-alert/igwn_alert_overseer") }}
+{{ $path | base | indent 2 }}: |-
+{{ $.Files.Get $path | indent 4 }}
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: igwn-alert-supervisor
+data:
+{{- $path := (print "files/igwn-alert/igwn-overseer.conf") }}
+{{ $path | base | indent 2 }}: |-
+{{ $.Files.Get $path | indent 4 }}
+---
+{{ if not .Values.sandboxed.enabled }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: shibboleth-configs
+data:
+{{- $server := .Values.publicName }}
+{{- $contact := .Values.tier.supportContact }}
+{{- range $path,$_ := .Files.Glob "files/shibboleth/*" }}
+{{ $path | base | indent 2 }}: |
+{{ $.Files.Get $path | indent 4 | replace "GRACEDB_SERVER_PUBLIC" $server | replace "SUPPORT_CONTACT" $contact }}
+{{- end }}
+{{ end }}
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: env
+data:
+  ENABLE_AWS_XRAY: "false"
+  AWS_SES_ACCESS_KEY_ID: dummy
+  AWS_SES_SECRET_ACCESS_KEY: dummy
+  AWS_SES_REGION_NAME: dummy
+  AWS_SES_REGION_ENDPOINT: dummy
+  DJANGO_DOCKER_MEMCACHED_ADDR: {{ include "gracedb.fullname" . }}-memcached.{{ .Release.Namespace}}:11211
+  DJANGO_AWS_ELASTICACHE_ADDR: {{ include "gracedb.fullname" . }}-memcached.{{ .Release.Namespace}}:11211
+  {{- if .Values.distributed.enabled }}
+  DJANGO_DB_HOST: {{ include "gracedb.fullname" . }}-postgresql-primary.{{ .Release.Namespace }}
+  {{- else }}
+  DJANGO_DB_HOST: {{ include "gracedb.fullname" . }}-postgres
+  {{- end }}
+  DJANGO_DB_NAME: {{ .Values.database.name }}
+  DJANGO_DB_USER: {{ .Values.database.user }}
+  DJANGO_ALERT_EMAIL_FROM: {{ .Values.tier.supportContact }}
+  DJANGO_SETTINGS_MODULE: config.settings.container.generic-test
+  DJANGO_TWILIO_ACCOUNT_SID: dummy
+  DJANGO_TWILIO_AUTH_TOKEN: dummy
+  DJANGO_SUPERUSER_USERNAME: {{ .Values.gracedb.djangoSuperuserName}}
+  DJANGO_SUPERUSER_EMAIL: {{ .Values.gracedb.djangoSuperuserEmail}}
+  SMTP_HOST: dummy
+  SMTP_USERNAME: dummy
+  SMTP_PASSWORD: dummy
+  POSTGRES_USER: {{ .Values.database.user }}
+  POSTGRES_DB: {{ .Values.database.name }}
+  {{if  .Values.gracedb.igwnAlertAuth }}
+  IGWN_ALERT_AUTH: "True"
+  IGWN_ALERT_AUTH_FLAG: ""
+  {{ else }}
+  IGWN_ALERT_AUTH: "False"
+  IGWN_ALERT_AUTH_FLAG: "--noauth"
+  IGWN_ALERT_USER: "dummy"
+  IGWN_ALERT_PASSWORD: "dummy"
+  {{ end }}
+  IGWN_ALERT_SERVER: "kafka://{{ .Values.gracedb.igwnAlertServer }}"
+  IGWN_ALERT_FLUSH_INTERVAL: "1000"
+  IGWN_ALERT_OVERSEER_PORT: "9092"
+  IGWN_ALERT_GROUP: {{ .Values.gracedb.igwnAlertGroup }}
+  ENABLE_LVALERT_OVERSEER: "false"
+  LVALERT_USER: "dummy"
+  LVALERT_PASSWORD: "dummy"
+  LVALERT_SERVER: "dummy"
+  LVALERT_OVERSEER_PORT: "0"
+---
+{{ if .Values.sandboxed.enabled }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: gracedb-urls-patched
+data:
+{{- range $path,$_ := .Files.Glob "files/django/urls.py" }}
+  urls.py: |-
+{{ $.Files.Get $path | indent 4 }}
+{{- end }}
+{{ end }}
+---
+{{ if .Values.sandboxed.enabled }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: login-template
+data:
+{{- range $path,$_ := .Files.Glob "files/django/login.html" }}
+  login.html: |-
+{{ $.Files.Get $path | indent 4 }}
+{{- end }}
+{{ end }}
+---
+{{ if .Values.sandboxed.enabled }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: get-user
+data:
+{{- range $path,$_ := .Files.Glob "files/django/get_or_edit_account.py" }}
+  get_or_edit_account.py: |-
+{{ $.Files.Get $path | indent 4 }}
+{{- end }}
+{{ end }}
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: remove-mdc-events
+data:
+{{- range $path,$_ := .Files.Glob "files/django/remove_mdc_events.py" }}
+  remove_mdc_events.py: |-
+{{ $.Files.Get $path | indent 4 }}
+{{- end }}

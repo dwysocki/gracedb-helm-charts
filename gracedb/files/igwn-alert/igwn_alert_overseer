@@ -1,0 +1,376 @@
+#!/usr/bin/python3
+# -*- coding: utf-8 -*-
+# Copyright (C) Alexander Pace, Tanner Prestegard (2022)
+#               Branson Stevens (2015)
+#
+# This file is part of igwn-alert-overseer
+#
+# igwn-alert-overseer is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# It is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with LIGO.ORG.  If not, see <http://www.gnu.org/licenses/>.
+
+import json
+from datetime import datetime
+import logging
+from logging import handlers
+from hashlib import sha1
+
+from twisted.internet.protocol import ServerFactory, Protocol
+from twisted.protocols.basic import LineReceiver
+from twisted.internet import reactor, task
+from twisted.internet.error import ReactorNotRunning
+
+from threading import Thread
+from optparse import OptionParser
+
+from igwn_alert import client as alert_client
+
+import pkg_resources
+from time import sleep
+
+#-------------------------------------------------------------------------------------
+# Parse options
+#-------------------------------------------------------------------------------------
+
+parser = OptionParser()
+
+#username and password
+parser.add_option("-a", "--username", action="store", type="string",
+    default="", help="the username of the publisher or listener")
+parser.add_option("-b", "--password", action="store", type="string",
+    default="", help="the password of the publisher or listener")
+parser.add_option("-n", "--noauth", action="store_true",
+    default=False, help="unauthenticated session")
+parser.add_option("-g", "--group", action="store", type="string",
+    default="lvalert-dev", help="group prefix on kafka server")
+parser.add_option("-s", "--server", action="store", type="string",
+    default="kafka://kafka.scimma.org/", help="the pubsub server")
+
+# server options
+parser.add_option("-p", "--port", action="store", type="int",
+    default=8000, help="port for the overseer server to listen on")
+parser.add_option("-l", "--audit-filename", action="store", type="string",
+    default="-", help="name for an audit (verbose) log file. '-' = stdout")
+parser.add_option("-e", "--error-filename", action="store", type="string",
+    default="-", help="name for an error log file. '-' = stdout")
+parser.add_option("-q", "--latency-filename", action="store", type="string",
+    default="-", help="name for a latency log file. '-' = stdout")
+
+# flushing options
+parser.add_option("-f", "--flush-queue", action="store_true",
+    default=False, help="periodically flush message queue")
+parser.add_option("-i", "--flush-interval", action="store", type="int",
+    default=500, help="periodically flush message queue")
+
+# debugging options
+parser.add_option("-d", "--debug", action="store_true",
+    default=False, help="should print out lots of information")
+parser.add_option("-c", "--disable-consumer", action="store_true",
+    default=False, help="disables consumer (listener) threads for debugging")
+
+# timeout
+parser.add_option("-m", "--max_attempts", action="store",
+    default=10, help="max number of timeouts allowed for sending")
+parser.add_option("-t", "--msg-timeout", action="store",
+    default=10, help="time in seconds after which a message is considered lost")
+
+# version
+parser.add_option("-v", "--version", action="store_true",
+    default=False, help="display version information")
+
+options,args = parser.parse_args()
+
+if options.version:
+    version = pkg_resources.require("igwn-alert-overseer")[0].version
+    print("igwn_alert overseer v. %s" % version)
+    exit(0)
+
+if not options.noauth:
+    if not options.username:
+        raise ValueError("--username is required")
+    if not options.password:
+        raise ValueError("--password is required")
+
+#-------------------------------------------------------------------------------------
+#-------------------------------------------------------------------------------------
+# Configure logging
+#-------------------------------------------------------------------------------------
+#-------------------------------------------------------------------------------------
+
+# We are going to have the main thread as well as two subsidiary threads.
+# Logs from each will be distinguished by the name of the logger.
+ovrseer_logger = logging.getLogger('ovrseer')
+latency_logger = logging.getLogger('latency')
+
+formatter = logging.Formatter('OVERSEER | %(asctime)s.%(msecs)03d | %(name)s '
+    '%(levelname)s | %(filename)s, line %(lineno)s | %(message)s')
+lformatter = logging.Formatter(fmt='KAFKA_LATENCY    %(asctime)s.%(msecs)03d    %(message)s ',
+        datefmt='%Y-%m-%d,%H:%M:%S')
+
+# Set up "audit" logger
+if options.audit_filename == '-':
+    audit_fh = logging.StreamHandler()
+else:
+    audit_fh = handlers.TimedRotatingFileHandler(options.audit_filename,
+        'midnight', backupCount=8)
+audit_fh.setLevel(logging.DEBUG)
+audit_fh.setFormatter(formatter)
+
+# Set up "error" logger
+if options.error_filename == '-':
+    error_fh = logging.StreamHandler()
+else:
+    error_fh = handlers.TimedRotatingFileHandler(options.error_filename,
+        'midnight', backupCount=8)
+error_fh.setLevel(logging.ERROR)
+error_fh.setFormatter(formatter)
+
+# Set up "latency" logger
+if options.latency_filename == '-':
+    latency_fh = logging.StreamHandler()
+else:
+    latency_fh = handlers.TimedRotatingFileHandler(options.latency_filename,
+        'midnight', backupCount=8)
+    latency_fh.setLevel(logging.INFO)
+latency_fh.setFormatter(lformatter)
+
+
+for logger in [ovrseer_logger]:
+    if options.debug:
+        logger.setLevel(logging.DEBUG)
+    else:
+        logger.setLevel(logging.INFO)
+    logger.addHandler(audit_fh)
+    logger.addHandler(error_fh)
+
+latency_logger.setLevel(logging.INFO)
+latency_logger.addHandler(latency_fh)
+
+#-------------------------------------------------------------------------------------
+#-------------------------------------------------------------------------------------
+# IGWN Alert Overseer
+#-------------------------------------------------------------------------------------
+#-------------------------------------------------------------------------------------
+
+
+class IGWNAOverseerProtocol(LineReceiver):
+    # Set the max alert length at 4mb
+    MAX_LENGTH= 4194304
+
+    def badRequest(self, msg):
+        """What to do if the client sends us a bad request."""
+        rdict = {'error': msg, 'success': False}
+        ovrseer_logger.error("Bad request: " + msg)
+        self.sendLine(json.dumps(rdict))
+        return
+
+    def lineLengthExceeded(self, data):
+        ovrseer_logger.error("ERROR: Message length exceeds maximum")
+
+    def lineReceived(self, data):
+        """Handle data delivered to the server. We will assume this is JSON
+        and parse the message and topic name out of it."""
+
+        ovrseer_logger.info("Payload received. Processing for transmission.")
+
+        try:
+            master_dict = json.loads(data.decode())
+        except Exception as e:
+            ovrseer_logger.error("Could not decode payload: %s" % str(e))
+            return
+
+        # Parse the incoming alert from GraceDB:
+        topics = master_dict.get('node_name', None)
+        if not topics:
+            self.badRequest('topic name missing')
+            return
+
+        # Interpret the node_name as a string, or a list of strings. 
+        try:
+            if isinstance(topics, str): topics=[topics]
+        except Exception as e:
+            ovrseer_logger.info("Could not convert topic: %s" % str(e))
+            return
+
+        # Get the message contents from the packet
+        message = master_dict.get('message', None)
+        if not message:
+            self.badRequest('message missing')
+
+        # Get the action (push/pop) from the packet
+        action = master_dict.get('action', None)
+        if action not in ['push', 'pop']:
+            self.badRequest('action must be "push" or "pop"')
+            return
+
+        if action == 'push':
+            # Push the message into the list with a timestamp
+            # FIXME: disabling for now. push this to a database of some point.
+            # The issue is, when running across nodes, this list gets populated 
+            # but there's no guarantee that a message will land on the same node
+            # that it's sent from. 
+
+            #self.factory.outstanding_messages.update({
+            #    message_id: datetime.now() })
+            # Send the message:
+
+            for topic in topics: 
+                try:
+                # Loop over topics and send the message:
+                    # Construct a unique message ID 
+                    message_id = sha1((topic + message).encode('utf-8')).hexdigest()
+
+                    # Increment the message count for this topic for flushing:
+                    self.factory.message_counter[topic] = self.factory.message_counter.get(topic, 0) + 1
+
+                    # Write a log message:
+                    ovrseer_logger.info("sending %s to topic %s" % (message_id, topic))
+
+                    # Publish the message:
+                    self.factory.client.publish_to_topic(topic, message)
+                    ovrseer_logger.info("sent %s to topic %s" % (message_id, topic))
+
+                    # If necessary, flush the session for the given topic. 
+                    if (options.flush_queue and
+			not self.factory.message_counter[topic] % options.flush_interval):
+                        ovrseer_logger.info(f"flushing session for topic {topic}")
+                        self.factory.client.flush_by_topic(topic)
+                except Exception as e:
+                    ovrseer_logger.error("SEND FAILED: %s" % str(e))
+    
+            self.transport.write(str.encode(json.dumps({'success': True})))
+            self.transport.loseConnection()
+
+
+class IGWNAOverseerFactory(ServerFactory):
+
+    protocol = IGWNAOverseerProtocol
+
+    def __init__(self, client = None, thread = None):
+        self.client = client
+        self.thread = thread
+        self.outstanding_messages = {}
+        self.message_counter = {}
+
+    # Kill the connection to the kafka server.
+    def stopFactory(self):
+        try:
+            self.thread.kill_switch = True
+            self.client.disconnect()
+            reactor.callInThread(reactor.stop)
+        except Exception as e:
+            ovrseer_logger.error("Problem killing the igwn_alert loop: %s" % str(e))
+            exit(1)
+
+    # Only accept connections from localhost
+    def buildProtocol(self, addr):
+        if addr.host == "127.0.0.1":
+            return ServerFactory.buildProtocol(self, addr)
+        return None
+
+    def on_alert(self, topic=None, payload=None):
+        # Calculate message_id:
+        try:
+            message_id = sha1((topic + json.dumps(payload)).encode('utf-8')).hexdigest()
+        except Exception as e:
+            ovrseer_logger.error("could not calculate message_id: %s" % str(e))
+
+        ovrseer_logger.info("received %s " % message_id)
+
+#-------------------------------------------------------------------------------------
+# Thread object for starting up an Alert client
+#-------------------------------------------------------------------------------------
+
+class IGWNAlertThread(Thread):
+    def __init__(self, igwn_alert_client):
+        Thread.__init__(self)
+        self.igwn_alert_client = igwn_alert_client
+        self.kill_switch = False
+        self.daemon = True
+
+    def run(self):
+
+       ovrseer_logger.info("kafka overseer gathering topic list... ")
+       try:
+           all_topics = self.igwn_alert_client.get_topics()
+       except Exception as e:
+           ovrseer_logger.error("Could not get alert topic list: %s" % str(e))
+
+       ovrseer_logger.info("kafka overseer connecting %s producers... "
+               % len(all_topics))
+       try:
+           self.igwn_alert_client.connect(all_topics)
+       except Exception as e:
+           ovrseer_logger.error("Could not connect producer instances: %s" % str(e))
+
+       # do some misc startup logging:
+       if options.flush_queue:
+           ovrseer_logger.info("flushing topic queues every {} messages".format(
+                                   options.flush_interval))
+
+    def igwn_alert_listener(self, callback):
+        ovrseer_logger.info("starting alert_client listener")
+        try:
+            self.igwn_alert_client.listen(callback)
+        except Exception as e:
+            ovrseer_logger.error("exited alert_client listener call: %s" %
+                    str(e))
+
+    def igwn_alert_dummy_listener(self, dummy_wait=5.0):
+        ovrseer_logger.info("starting alert_client dummy listener")
+        while not self.kill_switch:
+            try:
+                sleep(dummy_wait)
+            except (SystemExit, KeyboardInterrupt):
+                self.kill_switch = True
+                try:
+                    reactor.callFromThread(reactor.stop)
+                except ReactorNotRunning:
+                    pass
+
+
+#-------------------------------------------------------------------------------------
+# Main igwn-alert overseer routine
+#-------------------------------------------------------------------------------------
+
+if __name__ == '__main__':
+
+    # Instantiate the jabber client
+    igwn_alert_client = alert_client(username=options.username,
+                                     password=options.password,
+                                     server=options.server,
+                                     noauth=options.noauth,
+                                     group=options.group)
+    igwn_alert_thread = IGWNAlertThread(igwn_alert_client)
+    igwn_alert_thread.start()
+
+    # Start the twisted server. This will listen for new data to transmit 
+    # to the kafka broker
+    f = IGWNAOverseerFactory(igwn_alert_client, igwn_alert_thread)
+
+    # Begin listening over the specified port.
+    reactor.listenTCP(options.port, f)
+
+    try:
+        if not options.disable_consumer:
+            ovrseer_logger.info("starting the factory listener")
+            reactor.callInThread(igwn_alert_thread.igwn_alert_listener, f.on_alert)
+        else:
+            ovrseer_logger.info("starting dummy loop")
+            reactor.callInThread(igwn_alert_thread.igwn_alert_dummy_listener)
+
+    except Exception as e:
+        ovrseer_logger.error("could not start listener thread: %s" % str(e))
+
+    ovrseer_logger.info("starting the overseer reactor...")
+    reactor.run()
+

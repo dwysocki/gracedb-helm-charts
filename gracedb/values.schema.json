@@ -1,0 +1,252 @@
+{
+    "$schema": "https://json-schema.org/draft-07/schema",
+    "type": "object",
+    "required": [
+        "cert_manager",
+        "distributed",
+        "sandboxed",
+        "alerts",
+        "storageClassName",
+        "database",
+        "publicName",
+        "gracedb"
+    ],
+    "properties": {
+        "cert_manager": {
+            "type": "object",
+            "description": "cert-manager.io support configuration",
+            "required": [
+                "enabled"
+            ],
+            "properties": {
+                "enabled": {
+                    "type": "boolean",
+                    "description": "If *true* enabled automatic creation of TLS certificates using cert-manager.io operator"
+                },
+                "issuer": {
+                    "type": "object",
+                    "description": "issuer to use for the TLS certificate (if no issuer is given a self-signed certificate is created)",
+                    "properties": {
+                        "name": {
+                            "type": "string",
+                            "description": "the Issuer resource name"
+                        },
+                        "kind": {
+                            "type": "string",
+                            "description": "the issuer resource type: either Issuer or ClusterIssuer",
+                            "oneOf": [
+                                {
+                                    "const": "Issuer"
+                                },
+                                {
+                                    "const": "ClusterIssuer"
+                                }
+                            ]
+                        }
+                    }
+                }
+            }
+        },
+        "distributed": {
+            "type": "object",
+            "required": [
+                "enabled"
+            ],
+            "properties": {
+                "enabled": {
+                    "type": "boolean",
+                    "description": "If *true* enables distributed deployment (will use a distributed version of postgreSQL)"
+                }
+            }
+        },
+        "sandboxed": {
+            "type": "object",
+            "required": [
+                "enabled"
+            ],
+            "properties": {
+                "enabled": {
+                    "type": "boolean",
+                    "description": "If *true* deploys a sandboxed version of GraceDB (without shibboleth authentication). This is required for local deployments."
+                }
+            }
+        },
+        "alerts": {
+            "type": "object",
+            "required": [
+                "igwn"
+            ],
+            "properties": {
+                "igwn": {
+                    "type": "boolean",
+                    "description": "If *true* enables the IGWN-alert overseer"
+                }
+            }
+        },
+        "storageClassName": {
+            "type": "string",
+            "description": "Name of the k8s storage class to be used in PVCs"
+        },
+        "storageClassNameRWX": {
+            "type": "string",
+            "description": "Name of the k8s storage class to be used in ReadWriteMany PVCs (only used in distributed deployments)"
+        },
+        "database": {
+            "type": "object",
+            "required": [
+                "name",
+                "user",
+                "storageCapacity"
+            ],
+            "properties": {
+                "name": {
+                    "type": "string",
+                    "description": "Name of the (postgreSQL) database to be used by GraceDB"
+                },
+                "user": {
+                    "type": "string",
+                    "description": "Name of the DB user for GraceDB"
+                },
+                "storageCapacity": {
+                    "type": "string",
+                    "description": "Storage capacity to be allocated for postgreSQL's PVC"
+                },
+                "readReplicas": {
+                    "type": "integer",
+                    "description": "The number of read replicas for the database (only relevant if `distributed.enabled` is *true*"
+                }
+            }
+        },
+        "publicName": {
+            "type": "string",
+            "description": "The public FQDN of the GraceDB webserver (will also be used by the gracedb api client when making requests)"
+        },
+        "tier": {
+            "type": "object",
+            "properties": {
+                "sentryEnvironment": {
+                    "type": "string",
+                    "description": "Name of the Sentry environment"
+                },
+                "supportContact": {
+                    "type": "string",
+                    "description": "Support contact (used by Shibboleth)"
+                }
+            }
+        },
+        "gracedb": {
+            "type": "object",
+            "required": [
+                "image",
+                "storage",
+                "resources",
+                "djangoSuperuserName",
+                "djangoSuperuserEmail",
+                "igwnAlertAuth",
+                "igwnAlertServer",
+                "igwnAlertGroup"
+            ],
+            "properties": {
+                "image": {
+                    "type": "string",
+                    "description": "The GraceDB container image to be used."
+                },
+                "storage": {
+                    "type": "object",
+                    "required": [
+                        "capacity"
+                    ],
+                    "properties": {
+                        "capacity": {
+                            "type": "string",
+                            "description": "The storace capacity to be allocated for the GraceDB data PVC."
+                        }
+                    }
+                },
+                "resources": {
+                    "type": "object",
+                    "required": [
+                        "cpu",
+                        "memory"
+                    ],
+                    "properties": {
+                        "cpu": {
+                            "type": "number",
+                            "description": "The number of CPUs to allocate for the GraceDB pod"
+                        },
+                        "memory": {
+                            "type": "string",
+                            "description": "The amount of memory to allocate for the GraceDB pod"
+                        }
+                    }
+                },
+                "djangoSuperuserName": {
+                    "type": "string",
+                    "description": "The name of the Django superuser (will be created if not already present)."
+                },
+                "djangoSuperuserEmail": {
+                    "type": "string",
+                    "description": "The email of the Django superuser"
+                },
+                "igwnAlertAuth": {
+                    "type": "boolean"
+                },
+                "igwnAlertServer": {
+                    "type": "string"
+                },
+                "igwnAlertGroup": {
+                    "type": "string"
+                },
+                "replicaCount": {
+                    "type": "integer",
+                    "description": "The number of replicas for the GraceDB server"
+                },
+                "pvcName": {
+                    "type": "string",
+                    "description": "Name of an external PVC of type RWX to be used as file storage"
+                }
+            }
+        },
+        "secrets": {
+            "description": "Secret (optional) values used to populate k8s secrets",
+            "type": "object",
+            "required": [
+                "enabled"
+            ],
+            "properties": {
+                "enabled": {
+                    "description": "Is *true* k8s secrets will be created and populated using the defined chart values.",
+                    "type": "boolean"
+                },
+                "djangoSecretKey": {
+                    "description": "The Django secet key used by GraceDB webserver.",
+                    "type": "string"
+                },
+                "djangoSuperuserPassword": {
+                    "description": "The password for the automatically created Django superuser.",
+                    "type": "string"
+                },
+                "dbPassword": {
+                    "description": "The password for GraceDB's postgreSQL DB.",
+                    "type": "string"
+                },
+                "igwnAlertUsername": {
+                    "description": "The username of the IGWN-alert broker.",
+                    "type": "string"
+                },
+                "igwnAlertPassword": {
+                    "description": "The password of the IGWN-alert broker.",
+                    "type": "string"
+                },
+                "shibbolethCert": {
+                    "description": "The x509 certificate for use by shibboleth.",
+                    "type": "string"
+                },
+                "shibbolethPKey": {
+                    "description": "The x509 private key for use by shibboleth.",
+                    "type": "string"
+                }
+            }
+        }
+    }
+}

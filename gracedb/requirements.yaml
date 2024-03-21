@@ -1,0 +1,15 @@
+dependencies:
+- name: memcached
+  version: 6.10.1
+  repository: oci://registry-1.docker.io/bitnamicharts
+  alias: memcached
+- name: postgresql
+  version: 14.0.5
+  repository: oci://registry-1.docker.io/bitnamicharts
+  alias: postgresql
+  condition: distributed.enabled
+- name: cert-manager
+  version: v1.14.3
+  repository: https://charts.jetstack.io
+  alias: cert-manager
+  condition: cert_manager.install

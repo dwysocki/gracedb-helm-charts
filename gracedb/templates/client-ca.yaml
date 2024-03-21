@@ -1,0 +1,12 @@
+# This is the CA of the personal LIGO certificates
+# used for event submission.
+apiVersion: v1
+kind: Secret
+metadata:
+    name: client-ca
+type: Opaque
+data:
+{{- range $path,$_ := .Files.Glob "certificates/client.ca" }}
+  tls.ca: |-
+{{ $.Files.Get $path | b64enc | indent 4 }}
+{{- end }}

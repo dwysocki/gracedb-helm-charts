@@ -1,0 +1,30 @@
+{{- if .Values.cert_manager.enabled }}
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: &name {{ template "gracedb.fullname" . }}-tls
+  annotations:
+    "helm.sh/hook": post-install,post-upgrade
+    "helm.sh/hook-weight": "2"
+spec:
+  secretName: gracedb-cert-tls
+
+  commonName: &fqdn {{ .Values.publicName }}
+  privateKey:
+    algorithm: ECDSA
+    size: 256
+  usages:
+    - server auth
+  dnsNames:
+    - *fqdn
+
+  issuerRef:
+    {{- if .Values.cert_manager.issuer }}
+    name: {{ .Values.cert_manager.issuer.name }}
+    {{- if .Values.cert_manager.issuer.kind }}
+    kind: {{ .Values.cert_manager.issuer.kind }}
+    {{- end }}
+    {{- else }}
+    name: {{ template "gracedb.fullname" . }}-ca
+    {{- end }}
+{{- end }}

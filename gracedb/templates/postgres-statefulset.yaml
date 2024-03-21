@@ -1,0 +1,121 @@
+{{ if not .Values.distributed.enabled }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: &name {{ include "gracedb.fullname" . }}-postgres
+  labels:
+    app.kubernetes.io/name: postgres
+    app.kubernetes.io/instance: *name
+spec:
+  selector:
+    app: *name
+  ports:
+    - port: 5432
+      name: postgres
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: &name {{ include "gracedb.fullname" . }}-postgres
+  labels:
+    app.kubernetes.io/name: postgres
+    app.kubernetes.io/instance: *name
+spec:
+  serviceName: *name
+  replicas: 1
+  selector:
+    matchLabels:
+      app: *name
+  template:
+    metadata:
+      labels:
+        app: *name
+        app.kubernetes.io/part-of: gracedb
+      # This is needed to restart the pod when the configmap is changed
+      annotations:
+        checksum/config: {{ include (print $.Template.BasePath "/configmaps.yaml") . | sha256sum }}
+    spec:
+      affinity:
+        # Prefer scheduling of DB and webserver in the same node
+        podAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+            - weight: 100
+              podAffinityTerm:
+                labelSelector:
+                  matchLabels:
+                    app.kubernetes.io/part-of: gracedb
+                topologyKey: kubernetes.io/hostname
+
+      containers:
+        - name: postgres
+          resources:
+            requests:
+              cpu: {{ .Values.postgres.resources.cpu }}
+              memory: {{ .Values.postgres.resources.memory }}
+            limits:
+              cpu: {{ .Values.postgres.resources.cpu }}
+              memory: {{ .Values.postgres.resources.memory }}
+          image: {{ .Values.postgres.image }}
+          imagePullPolicy: {{ .Values.gracedb.pullPolicy }}
+          envFrom: &envFrom
+            - configMapRef:
+                name: env
+            - secretRef:
+                name: {{ include "gracedb.fullname" . }}-postgres
+          ports:
+            - name: postgres
+              containerPort: 5432
+          volumeMounts:
+            - name: postgres-persistent-storage
+              mountPath: /var/lib/postgresql/data
+            # - name: postgres-initdb
+            #   mountPath: /docker-entrypoint-initdb.d
+          livenessProbe:
+            exec:
+              command:
+              - sh
+              - -c
+              - "pg_isready -U postgres --dbname=${POSTGRES_DB}"
+            initialDelaySeconds: 100
+            periodSeconds: 20
+            timeoutSeconds: 10
+            failureThreshold: 3
+          readinessProbe:
+            exec:
+              command:
+              - sh
+              - -c
+              - "pg_isready -U postgres --dbname=${POSTGRES_DB}"
+            initialDelaySeconds: 10
+            periodSeconds: 20
+            timeoutSeconds: 10
+            failureThreshold: 3
+
+      initContainers:
+        - name: postgres-init
+          image: {{ .Values.postgres.image }}
+          command:
+            - sh
+            - -c
+            - |
+              rm -rf /var/lib/postgresql/data/lost+found
+          volumeMounts:
+            - name: postgres-persistent-storage
+              mountPath: /var/lib/postgresql/data
+      # volumes:
+      #   - name: postgres-initdb
+      #     secret:
+      #       secretName: {{ include "gracedb.fullname" . }}-initdb
+
+
+  volumeClaimTemplates:
+    - metadata:
+        name: postgres-persistent-storage
+      spec:
+        accessModes:
+          - ReadWriteOnce
+        resources:
+          requests:
+            storage: {{ .Values.database.storageCapacity }}
+        storageClassName: {{ .Values.storageClassName }}
+{{ end }}

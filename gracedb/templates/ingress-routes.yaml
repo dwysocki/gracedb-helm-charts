@@ -1,0 +1,44 @@
+apiVersion: traefik.containo.us/v1alpha1
+kind: IngressRoute
+metadata:
+  name: {{ include "gracedb.fullname" . }}
+  annotations:
+    kubernetes.io/ingress.class: traefik
+    traefik.frontend.passHostHeader: "true"
+    traefik.ingress.kubernetes.io/affinity: "true"
+spec:
+  entryPoints:
+    -  websecure
+  routes:
+  {{ if not .Values.sandboxed.enabled }}
+  - kind: Rule
+    match: Host(`{{ .Values.publicName  }}`) && PathPrefix(`/login`, `/Shibboleth.sso`, `/DiscoveryService`, `/shibboleth-ds`, `/post-login`, `/admin_docs`)
+    services:
+    - name: {{ include "gracedb.fullname" . }}-shibd
+      port: 80
+      weight: 10
+      passHostHeader: true
+      scheme: http
+      sticky:
+        cookie:
+          httpOnly: true
+          name: shibd-backend
+          secure: true
+          sameSite: none
+  {{ end }}
+  - kind: Rule
+    #priority: 1
+    #match: Host(`{{ .Values.publicName }}`) && PathPrefix(`/`) && !PathPrefix(`/flower/`) && !PathPrefix(`/flask/`)
+    match: Host(`{{ .Values.publicName }}`) && PathPrefix(`/`)
+    middlewares:
+    - name: client-cert
+    services:
+    - name: {{ include "gracedb.fullname" . }}
+      port: 80
+      weight: 10
+      passHostHeader: true
+      scheme: http
+  tls:
+    secretName: gracedb-cert-tls
+    options:
+      name: client-auth

@@ -1,0 +1,11 @@
+{{- if and (.Values.cert_manager.enabled) (not .Values.cert_manager.issuer) }}
+apiVersion: cert-manager.io/v1
+kind: Issuer
+metadata:
+  name: {{ template "gracedb.fullname" . }}-selfsigned
+  annotations:
+    "helm.sh/hook": post-install,post-upgrade
+    "helm.sh/hook-weight": "2"
+spec:
+  selfSigned: {}
+{{- end }}

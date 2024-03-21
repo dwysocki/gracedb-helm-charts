@@ -1,0 +1,12 @@
+dependencies:
+- name: memcached
+  repository: oci://registry-1.docker.io/bitnamicharts
+  version: 6.10.1
+- name: postgresql
+  repository: oci://registry-1.docker.io/bitnamicharts
+  version: 14.0.5
+- name: cert-manager
+  repository: https://charts.jetstack.io
+  version: v1.14.3
+digest: sha256:e94ca54ea45053069e5d359144411f983c6e7843b21b3d64d9c89dc99e7df011
+generated: "2024-03-07T16:59:27.52645277+01:00"

@@ -1,0 +1,119 @@
+<SPConfig xmlns="urn:mace:shibboleth:2.0:native:sp:config"
+   xmlns:conf="urn:mace:shibboleth:2.0:native:sp:config"
+   xmlns:saml="urn:oasis:names:tc:SAML:2.0:assertion"
+   xmlns:samlp="urn:oasis:names:tc:SAML:2.0:protocol"
+   xmlns:md="urn:oasis:names:tc:SAML:2.0:metadata" clockSkew="180">
+   <OutOfProcess>
+      <Extensions>
+         <Library path="plugins.so" fatal="true"/>
+      </Extensions>
+   </OutOfProcess>
+
+   <InProcess checkSpoofing="true" spoofKey="qo2q5gZXbKdBnE4wPMvJEw2IF1B9K1"/>
+
+   <UnixListener address="/tmp/shibd.sock"/>
+
+   <ApplicationDefaults entityID="https://GRACEDB_SERVER_PUBLIC/shibboleth-sp"
+      metadataAttributePrefix="Meta-" REMOTE_USER="krbPrincipalName eppn"
+      sessionHook="https://GRACEDB_SERVER_PUBLIC/Shibboleth.sso/AttrChecker">
+      <Sessions lifetime="120" timeout="120" relayState="ss:mem"
+         checkAddress="false" consistentAddress="false" handlerSSL="true"
+         cookieProps="https" redirectLimit="exact">
+         <SSO discoveryProtocol="SAMLDS"
+            discoveryURL="https://GRACEDB_SERVER_PUBLIC/DiscoveryService"
+            ECP="true">SAML2</SSO>
+         <Logout>Local</Logout>
+         <Handler type="MetadataGenerator" Location="/Metadata" signing="false"/>
+         <Handler type="Status" Location="/Status" acl="127.0.0.1 ::1
+            129.89.61.11"/>
+         <Handler type="Session" Location="/Session" showAttributeValues="true"/>
+         <Handler type="DiscoveryFeed" Location="/DiscoFeed"
+            contentType="application/json"/>
+         <Handler type="AttributeChecker" Location="/AttrChecker"
+            template="attrChecker-gracedb.html" flushSession="true"
+            attributes="isMemberOf"/>
+      </Sessions>
+
+      <Errors supportContact="SUPPORT_CONTACT" helpLocation="/about.html"
+         styleSheet="/shibboleth-sp/main.css"/>
+
+      <MetadataProvider type="XML"
+         url="http://md.incommon.org/InCommon/InCommon-metadata-idp-only.xml"
+         backingFilePath="InCommon-metadata.xml" maxRefreshDelay="900"
+         legacyOrgNames="true">
+         <MetadataFilter type="Signature"
+            certificate="/etc/shibboleth/inc-md-cert.pem" verifyBackup="false"/>
+         <MetadataFilter type="RequireValidUntil" maxValidityInterval="2419200"/>
+         <MetadataFilter type="Whitelist" matcher="EntityAttributes">
+            <saml:Attribute Name="http://macedir.org/entity-category-support"
+               NameFormat="urn:oasis:names:tc:SAML:2.0:attrname-format:uri">
+               <saml:AttributeValue>http://id.incommon.org/category/research-and-scholarship</saml:AttributeValue>
+            </saml:Attribute>
+            <saml:Attribute Name="http://macedir.org/entity-category-support"
+               NameFormat="urn:oasis:names:tc:SAML:2.0:attrname-format:uri">
+               <saml:AttributeValue>http://refeds.org/category/research-and-scholarship</saml:AttributeValue>
+            </saml:Attribute>
+         </MetadataFilter>
+         <MetadataFilter type="Blacklist" matcher="EntityAttributes">
+            <saml:Attribute Name="http://macedir.org/entity-category"
+               NameFormat="urn:oasis:names:tc:SAML:2.0:attrname-format:uri">
+               <saml:AttributeValue>http://refeds.org/category/hide-from-discovery</saml:AttributeValue>
+            </saml:Attribute>
+         </MetadataFilter>
+      </MetadataProvider>
+
+      <MetadataProvider type="XML"
+         url="https://md.cirrusidentity.com/metadata/CirrusIdentitySocialProviders-metadata.xml"
+         backingFilePath="CirrusIdentitySocialProviders-metadata.xml"
+         reloadInterval="86400">
+         <MetadataFilter type="RequireValidUntil" maxValidityInterval="1209600"/>
+         <MetadataFilter type="Whitelist">
+            <Include>https://google.cirrusidentity.com/gateway</Include>
+         </MetadataFilter>
+      </MetadataProvider>
+
+      <MetadataProvider type="XML"
+         url="https://liam-saml-metadata.s3.amazonaws.com/ligo-approved-idp-none.xml"
+         backingFilePath="ligo-approved-idp-none.xml" reloadInterval="900">
+         <MetadataFilter type="Signature"
+            certificate="/etc/shibboleth/login.ligo.org.cert.LIGOCA.pem"
+            verifyBackup="false"/>
+      </MetadataProvider>
+
+      <MetadataProvider type="XML"
+         url="https://liam-saml-metadata.s3.amazonaws.com/ligo-metadata.xml"
+         backingFilePath="ligo-metadata-.xml" reloadInterval="82800">
+         <MetadataFilter type="Signature"
+            certificate="/etc/shibboleth/login.ligo.org.cert.LIGOCA.pem"
+            verifyBackup="false"/>
+      </MetadataProvider>
+
+      <AttributeExtractor type="XML" validate="true" reloadChanges="false"
+         path="attribute-map.xml"/>
+
+      <AttributeExtractor type="Metadata" errorURL="errorURL"
+         DisplayName="displayName" Description="description"
+         InformationURL="informationURL"
+         PrivacyStatementURL="privacyStatementURL"
+         OrganizationName="organizationName"
+         OrganizationDisplayName="organizationDisplayName"
+         OrganizationURL="organizationURL"/>
+
+      <AttributeResolver type="Query" subjectMatch="true"/>
+
+      <AttributeResolver type="SimpleAggregation" attributeId="eppn"
+         format="urn:oid:1.3.6.1.4.1.5923.1.1.1.6">
+         <Entity>https://aa.gw-astronomy.org/aa/shibboleth</Entity>
+      </AttributeResolver>
+
+      <AttributeFilter type="XML" validate="true" path="attribute-policy.xml"/>
+
+      <CredentialResolver type="File" key="sp-key.pem" certificate="sp-cert.pem"/>
+
+   </ApplicationDefaults>
+
+   <SecurityPolicyProvider type="XML" validate="true" path="security-policy.xml"/>
+
+   <ProtocolProvider type="XML" validate="true" reloadChanges="false"
+      path="protocols.xml"/>
+</SPConfig>
