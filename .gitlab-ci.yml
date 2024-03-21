@@ -77,16 +77,19 @@ helm:build:gracedb:
     - tags
   needs:
     - job: helm:build:${CHART_DIRECTORY}
-      optional: true
 
 helm:publish:hopskotch:
   extends:
     - .helm:publish
   variables:
     CHART_DIRECTORY: hopskotch
+  needs:
+    - job: helm:build:${CHART_DIRECTORY}
 
 helm:publish:gracedb:
   extends:
     - .helm:publish
   variables:
     CHART_DIRECTORY: gracedb
+  needs:
+    - job: helm:build:${CHART_DIRECTORY}
