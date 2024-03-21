@@ -7,17 +7,30 @@ variables:
 
 # Execute lint checks
 # if the chart is modified
-helm:lint:
+.helm:lint:
   stage: build
   image: 
     name: alpine/helm:3.7.1
     entrypoint: [""] 
   script:
-    - helm lint hopskotch
+    - helm lint ${CHART_DIRECTORY}
   rules:
     - changes:
-        - hopskotch/*
+        - ${CHART_DIRECTORY}/*
     - when: never
+
+helm:lint:hopskotch:
+  extends:
+    - .helm:lint
+  variables:
+    CHART_DIRECTORY: hopskotch
+
+helm:lint:gracedb:
+  extends:
+    - .helm:lint
+  variables:
+    CHART_DIRECTORY: gracedb
+
 
 # These steps build the Helm chart package
 # and upload it to the helm-charts repo
