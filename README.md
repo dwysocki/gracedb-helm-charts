@@ -38,17 +38,8 @@ This is a simple Helm chart that deploys the Hop server as outlined in: https://
 ### Topic creation
 Topics are automatically created via a Kubernetes Job, which starts after the server deployment is completed.
 
-To check if topics are properly created:
-```
-./scripts/check-topics.sh <namespace>
-```
-
-### Client 
-We provide a simple client to execute _kcat_ commands for testing purposes:
-```
-./scripts/run-client.sh <namespace>
-```
+## GraceDB chart 
 
 ## CI pipeline
-This repository's CI pipeline builds and uploads the Helm chart to the the package registry whenever a new tag is created.
+This repository's CI pipeline builds and uploads the Helm charts to the the package registry whenever a new tag is created.
 
