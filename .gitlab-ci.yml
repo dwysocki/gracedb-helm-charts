@@ -78,6 +78,7 @@ helm:build:gracedb:
   needs:
     - job: helm:build:${CHART_DIRECTORY}
       optional: true
+      artifacts: true
 
 helm:publish:hopskotch:
   extends:
