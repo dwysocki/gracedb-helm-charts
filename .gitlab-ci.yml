@@ -86,8 +86,8 @@ helm:lint:gracedb:
 #  variables:
 #    CHART_DIRECTORY: hopskotch
 
-helm:publish:gracedb:
-  extends:
-    - .helm:publish
-  variables:
-    CHART_DIRECTORY: gracedb
+#helm:publish:gracedb:
+#  extends:
+#    - .helm:publish
+#  variables:
+#    CHART_DIRECTORY: gracedb
