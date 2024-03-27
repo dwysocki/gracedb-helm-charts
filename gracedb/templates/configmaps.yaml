@@ -81,9 +81,9 @@ data:
   DJANGO_SETTINGS_MODULE: config.settings.container.generic-test
   DJANGO_TWILIO_ACCOUNT_SID: dummy
   DJANGO_TWILIO_AUTH_TOKEN: dummy
-  DJANGO_SUPERUSER_USERNAME: {{ .Values.gracedb.djangoSuperuserName}}
-  DJANGO_SUPERUSER_EMAIL: {{ .Values.gracedb.djangoSuperuserEmail}}
-  DJANGO_SENTRY_ENVIRONMENT: {{ .Values.tier.sentryEnvironment | default "generic-test"}}
+  DJANGO_SUPERUSER_USERNAME: {{ .Values.gracedb.djangoSuperuserName }}
+  DJANGO_SUPERUSER_EMAIL: {{ .Values.gracedb.djangoSuperuserEmail }}
+  DJANGO_SENTRY_ENVIRONMENT: {{ .Values.tier.sentryEnvironment | default "generic-test" }}
   SMTP_HOST: dummy
   SMTP_USERNAME: dummy
   SMTP_PASSWORD: dummy
