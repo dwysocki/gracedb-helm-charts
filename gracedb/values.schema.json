@@ -16,12 +16,17 @@
             "type": "object",
             "description": "cert-manager.io support configuration",
             "required": [
-                "enabled"
+                "enabled",
+                "install"
             ],
             "properties": {
                 "enabled": {
                     "type": "boolean",
                     "description": "If *true* enabled automatic creation of TLS certificates using cert-manager.io operator"
+                },
+                "install": {
+                    "type": "boolean",
+                    "description": "If *true* install the cert-manager.io operator"
                 },
                 "issuer": {
                     "type": "object",
@@ -159,7 +164,7 @@
                     "properties": {
                         "capacity": {
                             "type": "string",
-                            "description": "The storace capacity to be allocated for the GraceDB data PVC."
+                            "description": "The storage capacity to be allocated for the GraceDB data PVC."
                         }
                     }
                 },
@@ -186,16 +191,19 @@
                 },
                 "djangoSuperuserEmail": {
                     "type": "string",
-                    "description": "The email of the Django superuser"
+                    "description": "The email of the Django superuser."
                 },
                 "igwnAlertAuth": {
-                    "type": "boolean"
+                    "type": "boolean",
+                    "description": "Enable authenticated connections to the Hopskotch server." 
                 },
                 "igwnAlertServer": {
-                    "type": "string"
+                    "type": "string",
+                    "description": "DNS name of the Hopskotch server." 
                 },
                 "igwnAlertGroup": {
-                    "type": "string"
+                    "type": "string", 
+                    "description": " Prefix for Kafka topics." 
                 },
                 "replicaCount": {
                     "type": "integer",
@@ -203,7 +211,7 @@
                 },
                 "pvcName": {
                     "type": "string",
-                    "description": "Name of an external PVC of type RWX to be used as file storage"
+                    "description": "Name of an external PVC of type RWX to be used as file storage."
                 }
             }
         },
@@ -215,11 +223,11 @@
             ],
             "properties": {
                 "enabled": {
-                    "description": "Is *true* k8s secrets will be created and populated using the defined chart values.",
+                    "description": "If *true* k8s secrets will be created and populated using the defined chart values.",
                     "type": "boolean"
                 },
                 "djangoSecretKey": {
-                    "description": "The Django secet key used by GraceDB webserver.",
+                    "description": "The Django secret key used by GraceDB webserver.",
                     "type": "string"
                 },
                 "djangoSuperuserPassword": {
@@ -239,14 +247,36 @@
                     "type": "string"
                 },
                 "shibbolethCert": {
-                    "description": "The x509 certificate for use by shibboleth.",
+                    "description": "The x509 certificate to be used for Shibboleth.",
                     "type": "string"
                 },
                 "shibbolethPKey": {
-                    "description": "The x509 private key for use by shibboleth.",
+                    "description": "The x509 private key to be used for Shibboleth.",
                     "type": "string"
                 }
             }
+        },
+        "postgres": {
+            "type": "object",
+            "properties": {
+                "image": {
+                    "description": "The PostgreSQL container image to be used (for non replicated deployment)",
+                    "type": "string"
+                },
+                "resources": {
+                    "type": "object",
+                    "properties": {
+                        "cpu": {
+                            "description": "The number of CPUs to allocate for the PostgreSQL pod",
+                            "type": "number"
+                        },
+                        "memory": {
+                            "description": "The amount of memory to allocate for the PostgreSQL pod",
+                            "type": "string" 
+                        }      
+                    }
+                }
+            } 
         }
     }
 }
