@@ -13,9 +13,6 @@ cert_manager:
   #   name: my-ca-issuer
   #   kind: Issuer / kind: ClusterIssuer
 
-## Do not touch
-cert-manager:
-  installCRDs: true
 
 # If true, deploy a distributed version of GraceDB and PostgreSQL.
 # If false, deploy a single-node instance of GraceDB and PostgreSQL.
@@ -61,7 +58,7 @@ tier:
   supportContact: "albert.einstein@ligo.org"
 
 gracedb:
-  image: containers.ligo.org/computing/gracedb/server:gracedb-2.27.0
+  image: "containers.ligo.org/computing/gracedb/server:gracedb-2.27.0"
   storage:
     capacity: 10Gi
   resources:
@@ -95,10 +92,14 @@ secrets:
 
 # This is for single instance DB architecture
 postgres:
-  image: postgres:16.2
+  image: "postgres:16.2"
   resources:
     cpu: 0.5
     memory: 1Gi
+
+## CONFIGURATION FOR SUBCHARTS
+cert-manager:
+  installCRDs: true
 
 # This is for replicated DB architecture (uses an external Helm chart)
 #postgresql:
@@ -138,10 +139,10 @@ postgres:
 memcached:
   replicaCount: 1
   resources:
-  requests:
-    cpu: 0.1
-    memory: 100Mi
-  limits:
-    cpu: 0.1
-    memory: 100Mi
+    requests:
+      cpu: 0.1
+      memory: 100Mi
+    limits:
+      cpu: 0.1
+      memory: 100Mi
 
