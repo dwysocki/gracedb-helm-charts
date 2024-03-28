@@ -82,6 +82,73 @@ Topics are automatically created via a Kubernetes Job, which starts after the se
 |`postgres.resources.cpu`| The number of CPUs to allocate for the PostgreSQL pod | number | 0.5
 |`postgres.resources.memory` | The amount of memory to allocate for the PostgreSQL pod | string | "1Gi"
 
+### Subcharts
+This chart depends on the following external charts:
+
+#### Memcached
+Chart: https://artifacthub.io/packages/helm/bitnami/memcached.
+
+The applied configuration for this chart is the following:
+```
+memcached:
+  replicaCount: 1
+  resources:
+    requests:
+      cpu: 0.1
+      memory: 100Mi
+    limits:
+      cpu: 0.1
+      memory: 100Mi
+```
+
+#### cert-manager (optional)
+Chart: https://artifacthub.io/packages/helm/cert-manager/cert-manager.
+The applied configuration for this chart is the following:
+```
+cert-manager:
+  installCRDs: true
+```
+
+#### PostgreSQL (optional)
+Chart: https://artifacthub.io/packages/helm/bitnami/postgresql
+
+This chart is only used in the distributed deployment. We suggest to use the following configuration options and reference an existing Secret for credentials:
+```
+postgresql:
+  architecture: replication
+  auth:
+    username: *database_user
+    database: *database_name
+    existingSecret: ""
+    secretKeys:
+      adminPasswordKey: ""
+      userPasswordKey: ""
+      replicationPasswordKey: ""
+  primary:
+    persistence:
+      size: *database_storage_capacity
+      storageClass: *storage_class
+    resources:
+      requests:
+        cpu: 1
+        memory: 1Gi
+      limits:
+        cpu: 1
+        memory: 1Gi
+  readReplicas:
+    replicaCount: *database_read_replicas
+    persistence:
+      size: *database_storage_capacity
+      storageClass: *storage_class
+    resources:
+      requests:
+        cpu: 1
+        memory: 1Gi
+      limits:
+        cpu: 1
+        memory: 1Gi
+```
+
 ## CI pipeline
 This repository's CI pipeline builds and uploads the Helm charts to the the package registry whenever a new tag is created.
 
