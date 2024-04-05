@@ -7,4 +7,13 @@ data:
 {{ $path | base | indent 2 }}: |-
 {{ $.Files.Get $path | indent 4 }}
 {{- end }}
-
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: create-topics-script
+data:
+{{- range $path,$_ := .Files.Glob "files/create-topics.sh" }}
+{{ $path | base | indent 2 }}: |-
+{{ $.Files.Get $path | indent 4 }}
+{{- end }}

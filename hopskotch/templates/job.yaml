@@ -17,15 +17,20 @@ spec:
           - sh
           - -c
           - |
-            while read t; do
-              topic="{{ .Release.Namespace }}.$t"
-              bash -c "echo dummy | kcat -P -b {{ include "hopskotch.fullname" . }}:9092 -t $topic"
-            done < /tmp/topics.txt 
+            cp /root/create-topics.sh .
+            chmod +x create-topics.sh 
+            ./create-topics.sh {{ .Release.Namespace }} {{ include "hopskotch.fullname" . }}
         volumeMounts:
+          - name: create-topics-script
+            mountPath: /root/create-topics.sh
+            subPath: create-topics.sh
           - name: topics-list
             mountPath: /tmp/topics.txt
             subPath: topics.txt
       volumes:
+      - name: create-topics-script
+        configMap:
+          name: create-topics-script
       - name: topics-list
         configMap:
           name: topics-list
