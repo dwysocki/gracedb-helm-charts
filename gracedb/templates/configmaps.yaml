@@ -89,15 +89,15 @@ data:
   SMTP_PASSWORD: dummy
   POSTGRES_USER: {{ .Values.database.user }}
   POSTGRES_DB: {{ .Values.database.name }}
-  {{if  .Values.gracedb.igwnAlertAuth }}
-  IGWN_ALERT_AUTH: "True"
-  IGWN_ALERT_AUTH_FLAG: ""
-  {{ else }}
-  IGWN_ALERT_AUTH: "False"
-  IGWN_ALERT_AUTH_FLAG: "--noauth"
+  #{{if  .Values.gracedb.igwnAlertAuth }}
+  #IGWN_ALERT_AUTH: {{ .Values.gracedb.igwnAlertAuth }}
+  #IGWN_ALERT_AUTH_FLAG: ""
+  #{{ else }}
+  #IGWN_ALERT_AUTH: "False"
+  #IGWN_ALERT_AUTH_FLAG: "--noauth"
   IGWN_ALERT_USER: "dummy"
   IGWN_ALERT_PASSWORD: "dummy"
-  {{ end }}
+  #{{ end }}
   IGWN_ALERT_SERVER: "kafka://{{ .Values.gracedb.igwnAlertServer }}"
   IGWN_ALERT_FLUSH_INTERVAL: "1000"
   IGWN_ALERT_OVERSEER_PORT: "9092"

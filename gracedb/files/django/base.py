@@ -106,7 +106,11 @@ if igwn_alert_overseer_port is None:
 igwn_alert_group = os.environ.get('IGWN_ALERT_GROUP', DEFAULT_IGWN_ALERT_GROUP)
 
 # Get igwn-alert auth
-igwn_alert_auth = parse_envvar_bool('IGWN_ALERT_AUTH')
+igwn_alert_auth = parse_envvar_bool(get_from_env(
+    'IGWN_ALERT_AUTH',
+    default_value='True',
+    fail_if_not_found=False
+    ))
 
 # Get igwn-alert username
 igwn_alert_user = os.environ.get('IGWN_ALERT_USER', None)

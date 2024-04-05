@@ -84,6 +84,8 @@ spec:
               value: "false"
             - name: ENABLE_IGWN_OVERSEER
               value: "{{ .Values.alerts.igwn }}"
+            - name:  IGWN_ALERT_AUTH
+              value: "{{ .Values.gracedb.igwnAlertAuth }}"
             - name: DJANGO_PRIMARY_FQDN
               value: {{ .Values.publicName }}
             - name: DJANGO_ALLOWED_HOSTS

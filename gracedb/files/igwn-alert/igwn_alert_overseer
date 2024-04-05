@@ -48,8 +48,8 @@ parser.add_option("-a", "--username", action="store", type="string",
     default="", help="the username of the publisher or listener")
 parser.add_option("-b", "--password", action="store", type="string",
     default="", help="the password of the publisher or listener")
-parser.add_option("-n", "--noauth", action="store_true",
-    default=False, help="unauthenticated session")
+parser.add_option("-n", "--auth", action="store", type="choice",
+    choices=["true","false"], default="true", help="authenticated session")
 parser.add_option("-g", "--group", action="store", type="string",
     default="lvalert-dev", help="group prefix on kafka server")
 parser.add_option("-s", "--server", action="store", type="string",
@@ -94,7 +94,12 @@ if options.version:
     print("igwn_alert overseer v. %s" % version)
     exit(0)
 
-if not options.noauth:
+
+noauth=False
+if options.auth == "false":
+  noauth=True
+
+if not noauth:
     if not options.username:
         raise ValueError("--username is required")
     if not options.password:
@@ -348,7 +353,7 @@ if __name__ == '__main__':
     igwn_alert_client = alert_client(username=options.username,
                                      password=options.password,
                                      server=options.server,
-                                     noauth=options.noauth,
+                                     noauth=noauth,
                                      group=options.group)
     igwn_alert_thread = IGWNAlertThread(igwn_alert_client)
     igwn_alert_thread.start()
