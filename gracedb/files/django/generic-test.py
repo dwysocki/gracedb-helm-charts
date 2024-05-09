@@ -96,4 +96,10 @@ to Playground or Production. Note, on this GraceDB instance:
 <li>Only LIGO logins are provided (no login via InCommon or Google).</li>
 </ul>
 """.format(INSTANCE_LIST)
-
+ 
+# This is for simple username/password authentication
+# needed by the sandboxed deployment (e.g. on Minikube)
+SANDBOXED = parse_envvar_bool( 
+    get_from_env('ENABLE_SANDBOXED',
+                 fail_if_not_found=False, default_value="false")
+)
