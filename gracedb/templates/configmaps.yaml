@@ -19,16 +19,6 @@ data:
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: django-update-site
-data:
-{{- range $path,$_ := .Files.Glob "files/django/0002_update_site.py" }}
-{{ $path | base | indent 2 }}: |-
-{{ $.Files.Get $path | indent 4 }}
-{{- end }}
----
-apiVersion: v1
-kind: ConfigMap
-metadata:
   name: igwn-alert-overseer
 data:
 {{- $path := (print "files/igwn-alert/igwn_alert_overseer") }}
