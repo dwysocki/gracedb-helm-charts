@@ -36,8 +36,10 @@ spec:
               name: {{ include "gracedb.fullname" . }}-postgres
           - secretRef:
               name: {{ include "gracedb.fullname" . }}
+          {{- if .Values.gracedb.igwnAlertAuth }}
           - secretRef:
               name: igwn-alert-credentials
+          {{ end }}
           env:
             - name: ENABLE_SHIBD
               value: "true"
