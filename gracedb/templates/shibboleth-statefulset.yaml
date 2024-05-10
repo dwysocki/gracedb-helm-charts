@@ -63,8 +63,8 @@ spec:
               mountPath: /app/gracedb_project/config/settings/container/base.py
               subPath: base.py
             - name: django-settings
-              mountPath: /app/gracedb_project/config/settings/container/{{ .Values.tier.instance }}.py
-              subPath: {{ .Values.tier.instance}}.py
+              mountPath: /app/gracedb_project/config/settings/container/generic-test.py 
+              subPath: generic-test.py
             - name: shibd-cache
               mountPath: "/var/cache/shibboleth"
             - name: read-write-configs

@@ -98,7 +98,6 @@ data:
   LVALERT_SERVER: "dummy"
   LVALERT_OVERSEER_PORT: "0"
 ---
-{{ if .Values.sandboxed.enabled }}
 apiVersion: v1
 kind: ConfigMap
 metadata:
@@ -108,9 +107,7 @@ data:
   urls.py: |-
 {{ $.Files.Get $path | indent 4 }}
 {{- end }}
-{{ end }}
 ---
-{{ if .Values.sandboxed.enabled }}
 apiVersion: v1
 kind: ConfigMap
 metadata:
@@ -120,7 +117,6 @@ data:
   login.html: |-
 {{ $.Files.Get $path | indent 4 }}
 {{- end }}
-{{ end }}
 ---
 {{ if .Values.sandboxed.enabled }}
 apiVersion: v1
