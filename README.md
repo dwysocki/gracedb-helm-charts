@@ -43,6 +43,7 @@ Topics are automatically created via a Kubernetes Job, which starts after the se
 
 | Name | Description | Type | Default value |
 | --- |--- | --- | ----- | 
+|`traefik.install`| Install Traefik | boolean | true
 | `cert_manager.enabled`| Enable automatic creation of TLS certificates using cert-manager.io operator | boolean | true
 |`cert_manager.install`| Install the cert-manager.io operator | boolean | true
 | `cert_manager.issuer.name` | Name of the issuer resource to use for the TLS certificate (if no issuer is given a self-signed certificate is created) | string | -
