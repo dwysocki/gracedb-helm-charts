@@ -101,6 +101,18 @@ memcached:
       memory: 100Mi
 ```
 
+#### Traefik (optional)
+Chart: https://artifacthub.io/packages/helm/traefik/traefik
+
+The applied configuration for this chart is the following:
+```
+traefik:
+  install: true
+  service:
+    spec:
+      clusterIP: 10.100.100.10
+```
+
 #### cert-manager (optional)
 Chart: https://artifacthub.io/packages/helm/cert-manager/cert-manager.
 The applied configuration for this chart is the following:

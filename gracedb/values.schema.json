@@ -12,6 +12,19 @@
         "gracedb"
     ],
     "properties": {
+        "traefik":{
+            "type": "object",
+            "required": [
+                "install"
+            ],
+            "properties": {
+                "install": {
+                    "type": "boolean",
+                    "description": "If *true* install the Traefik Helm chart"
+                }
+            }
+
+        }, 
         "cert_manager": {
             "type": "object",
             "description": "cert-manager.io support configuration",

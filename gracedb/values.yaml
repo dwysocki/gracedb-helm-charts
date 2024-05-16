@@ -1,6 +1,13 @@
 # Values starting with & are anchors to be used later in this file,
 # please do not change them!
 
+traefik:
+  install: true
+  service:
+    spec:
+      clusterIP: 10.100.100.10
+
+
 cert_manager:
   # Enable CRD-based automatic in-cluster certificate generation using
   # cert-manager.io operator (requires the operator and CRDs to be already
