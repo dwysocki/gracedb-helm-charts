@@ -94,7 +94,6 @@ if options.version:
     print("igwn_alert overseer v. %s" % version)
     exit(0)
 
-
 noauth=False
 if options.auth == "false":
   noauth=True
@@ -104,6 +103,10 @@ if not noauth:
         raise ValueError("--username is required")
     if not options.password:
         raise ValueError("--password is required")
+    if (( options.username == "dummy" ) and
+        ( options.password == "dummy" )) :
+        # If username and password are dummy use noauth
+        noauth=True
 
 #-------------------------------------------------------------------------------------
 #-------------------------------------------------------------------------------------

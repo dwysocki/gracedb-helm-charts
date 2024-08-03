@@ -56,12 +56,6 @@ spec:
               value: {{ include "gracedb.fullname" . }}-postgres
               {{ end }}
           volumeMounts:
-            - name: igwn-alert-supervisor
-              mountPath: /etc/supervisor/conf.d/igwn-overseer.conf
-              subPath: igwn-overseer.conf
-            - name: django-base-settings
-              mountPath: /app/gracedb_project/config/settings/container/base.py
-              subPath: base.py
             - name: django-settings
               mountPath: /app/gracedb_project/config/settings/container/generic-test.py 
               subPath: generic-test.py

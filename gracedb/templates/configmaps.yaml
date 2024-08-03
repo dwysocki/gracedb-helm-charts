@@ -68,7 +68,7 @@ data:
   DJANGO_DB_NAME: {{ .Values.database.name }}
   DJANGO_DB_USER: {{ .Values.database.user }}
   DJANGO_ALERT_EMAIL_FROM: {{ .Values.tier.supportContact }}
-  DJANGO_SETTINGS_MODULE: config.settings.container.generic-test
+  DJANGO_SETTINGS_MODULE: {{ .Values.tier.settingModule | default "config.settings.container.generic-test" }}
   DJANGO_TWILIO_ACCOUNT_SID: dummy
   DJANGO_TWILIO_AUTH_TOKEN: dummy
   DJANGO_SUPERUSER_USERNAME: {{ .Values.gracedb.djangoSuperuserName }}
