@@ -100,15 +100,15 @@ spec:
             - name: db-data
               mountPath: "/app/db_data"
             {{ if .Values.sandboxed.enabled }}
-            - name: django-base-settings
-              mountPath: /app/gracedb_project/config/settings/container/base.py
-              subPath: base.py
+            #- name: django-base-settings
+            #  mountPath: /app/gracedb_project/config/settings/container/base.py
+            #  subPath: base.py
             - name: igwn-alert-overseer
               mountPath: /usr/local/bin/igwn_alert_overseer
               subPath: igwn_alert_overseer
-            - name: igwn-alert-supervisor
-              mountPath: /etc/supervisor/conf.d/igwn-overseer.conf
-              subPath: igwn-overseer.conf
+            # - name: igwn-alert-supervisor
+            #   mountPath: /etc/supervisor/conf.d/igwn-overseer.conf
+            #   subPath: igwn-overseer.conf
             - name: gracedb-urls-patched
               mountPath: /app/gracedb_project/config/urls.py
               subPath: urls.py
@@ -191,9 +191,9 @@ spec:
         - name: remove-mdc-events
           configMap:
               name: remove-mdc-events
-        - name: django-base-settings
-          configMap:
-              name: django-base-settings
+        # - name: django-base-settings
+        #   configMap:
+        #       name: django-base-settings
         - name: django-settings
           configMap:
               name: django-settings
@@ -201,9 +201,9 @@ spec:
           configMap:
               name: igwn-alert-overseer
               defaultMode: 0755
-        - name: igwn-alert-supervisor
-          configMap:
-              name: igwn-alert-supervisor
+        # - name: igwn-alert-supervisor
+        #   configMap:
+        #       name: igwn-alert-supervisor
         {{ if .Values.distributed.enabled }}
         - name: db-data
           persistentVolumeClaim:

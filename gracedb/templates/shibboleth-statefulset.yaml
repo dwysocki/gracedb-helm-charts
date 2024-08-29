@@ -122,12 +122,12 @@ spec:
             - name: shibd-cache
               mountPath: /var/cache/shibboleth
       volumes:
-        - name: igwn-alert-supervisor
-          configMap:
-              name: igwn-alert-supervisor
-        - name: django-base-settings
-          configMap:
-              name: django-base-settings
+        # - name: igwn-alert-supervisor
+        #   configMap:
+        #       name: igwn-alert-supervisor
+        # - name: django-base-settings
+        #   configMap:
+        #       name: django-base-settings
         - name: django-settings
           configMap:
               name: django-settings
