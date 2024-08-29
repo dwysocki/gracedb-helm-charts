@@ -105,7 +105,7 @@ if not noauth:
         raise ValueError("--password is required")
     if (( options.username == "dummy" ) and
         ( options.password == "dummy" )) :
-        # If username and password are dummy use noauth
+        # If username and password are "dummy" use noauth
         noauth=True
 
 #-------------------------------------------------------------------------------------
@@ -351,6 +351,10 @@ class IGWNAlertThread(Thread):
 #-------------------------------------------------------------------------------------
 
 if __name__ == '__main__':
+
+    # Log that we are using noauth node
+    if noauth:
+        ovrseer_logger.info("starting un-authenticated session to server %s" % str(options.server))
 
     # Instantiate the jabber client
     igwn_alert_client = alert_client(username=options.username,
