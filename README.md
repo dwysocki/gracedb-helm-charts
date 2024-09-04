@@ -59,6 +59,7 @@ Topics are automatically created via a Kubernetes Job, which starts after the se
 |`database.readReplicas`| Number of read replicas for the database (only relevant for distributed deployments) | integer | -
 |`publicName`| The public FQDN of the GraceDB webserver (will also be used by the GraceDB API client when making requests) | string | "gracedb.default.svc.cluster.local"
 |`sentryEnvironment`| Name of the Sentry environment | string | "generic-test"
+|`settingModule`| Name of the DJANGO setting module | string | "config.settings.container.generic-test"
 |`supportContact`| Email of the support contact that will appear in the main page | string | "albert.einstein@ligo.org"
 |`gracedb.image`| The GraceDB container image to be used | string | "containers.ligo.org/computing/gracedb/server:gracedb-2.27.0"
 |`gracedb.storage.capacity`| The storage capacity to be allocated for the GraceDB data PVC | string | "10Gi"

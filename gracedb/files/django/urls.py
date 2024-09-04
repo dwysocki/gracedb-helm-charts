@@ -50,7 +50,9 @@ urlpatterns = [
     #        {'document_root': settings.LATENCY_REPORT_DEST_DIR}),
     re_path(r'^search/$', search.views.search, name="mainsearch"),
  
-    # Authentication (logout)
+    # Authentication
+    re_path(r'^login/$', LoginView.as_view(template_name = 'ligoauth/login.html'), name='login'),
+    re_path(r'^post-login/$', RedirectView.as_view(url=reverse_lazy('home:index')), name='post-login'),
     re_path(r'^logout/$', LogoutView.as_view(), name='logout'),
 
     # Password management
@@ -89,16 +91,4 @@ if settings.DEBUG and 'debug_toolbar' in settings.INSTALLED_APPS:
     import debug_toolbar
     urlpatterns = [
         re_path(r'^__debug__/', include(debug_toolbar.urls)),
-    ] + urlpatterns
-
-# Authentication (login)
-if settings.SANDBOXED:
-    urlpatterns = [
-      re_path(r'^login/$', LoginView.as_view(template_name = 'ligoauth/login.html'), name='login'),
-      re_path(r'^post-login/$', RedirectView.as_view(url=reverse_lazy('home:index')), name='post-login'),
-    ] + urlpatterns
-else: 
-    urlpatterns = [
-      re_path(r'^login/$', ShibLoginView.as_view(), name='login'),
-      re_path(r'^post-login/$', ShibPostLoginView.as_view(), name='post-login'),
     ] + urlpatterns

@@ -56,12 +56,6 @@ spec:
               value: {{ include "gracedb.fullname" . }}-postgres
               {{ end }}
           volumeMounts:
-            - name: igwn-alert-supervisor
-              mountPath: /etc/supervisor/conf.d/igwn-overseer.conf
-              subPath: igwn-overseer.conf
-            - name: django-base-settings
-              mountPath: /app/gracedb_project/config/settings/container/base.py
-              subPath: base.py
             - name: django-settings
               mountPath: /app/gracedb_project/config/settings/container/generic-test.py 
               subPath: generic-test.py
@@ -128,12 +122,12 @@ spec:
             - name: shibd-cache
               mountPath: /var/cache/shibboleth
       volumes:
-        - name: igwn-alert-supervisor
-          configMap:
-              name: igwn-alert-supervisor
-        - name: django-base-settings
-          configMap:
-              name: django-base-settings
+        # - name: igwn-alert-supervisor
+        #   configMap:
+        #       name: igwn-alert-supervisor
+        # - name: django-base-settings
+        #   configMap:
+        #       name: django-base-settings
         - name: django-settings
           configMap:
               name: django-settings
