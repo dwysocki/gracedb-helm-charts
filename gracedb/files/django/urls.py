@@ -44,12 +44,12 @@ urlpatterns = [
     re_path(r'^other/$', TemplateView.as_view(template_name='other.html'),
         name='other'),
     re_path(r'^performance/$', events.views.performance, name="performance"),
-    re_path(r'^reports/$', events.reports.histo, name="reports"),
+    re_path(r'^reports/$', events.reports.reports_page_context, name="reports"),
     re_path(r'^latest/$', search.views.latest, name="latest"),
     #(r'^reports/(?P<path>.+)$', 'django.views.static.serve',
     #        {'document_root': settings.LATENCY_REPORT_DEST_DIR}),
     re_path(r'^search/$', search.views.search, name="mainsearch"),
- 
+
     # Authentication
     re_path(r'^login/$', LoginView.as_view(template_name = 'ligoauth/login.html'), name='login'),
     re_path(r'^post-login/$', RedirectView.as_view(url=reverse_lazy('home:index')), name='post-login'),
