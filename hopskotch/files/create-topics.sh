@@ -17,3 +17,6 @@ while read t; do
   done
 done < /tmp/topics.txt
 
+bash -c "echo dummy | kcat -P -b $servername:9092 -t igwn.gwalert-minikube"
+
+
