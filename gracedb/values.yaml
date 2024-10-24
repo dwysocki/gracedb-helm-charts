@@ -70,8 +70,8 @@ gracedb:
   storage:
     capacity: 10Gi
   resources:
-    cpu: 4
-    memory: 5Gi
+    cpu: 2
+    memory: 8Gi
   # This is for Django admin user
   djangoSuperuserName: "admin"
   djangoSuperuserEmail: "albert.einstein@ligo.org"
