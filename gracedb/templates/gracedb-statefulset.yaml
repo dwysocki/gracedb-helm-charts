@@ -178,8 +178,7 @@ spec:
             - -c
             - >
               set -x;
-              if [ -f gracedb/events/management/commands/fix-labelling-duplicates.py ];then python3 manage.py fix-labelling-duplicates; fi
-              && python3 manage.py migrate
+              python3 manage.py migrate
               && python3 manage.py createcachetable
               && ([
               $(python3 manage.py shell -c "from django.contrib.auth import get_user_model; import os; print(len(get_user_model().objects.all().filter(username=os.getenv(\"DJANGO_SUPERUSER_USERNAME\"))))")
