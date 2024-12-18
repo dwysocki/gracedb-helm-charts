@@ -23,10 +23,10 @@ spec:
         - name: {{ include "gracedb.fullname" . }}-shibd
           resources:
             requests:
-              cpu: 2
+              cpu: 6
               memory: 6Gi
             limits:
-              cpu: 2
+              cpu: 6
               memory: 6Gi
           image: {{ .Values.gracedb.image }}
           envFrom:
