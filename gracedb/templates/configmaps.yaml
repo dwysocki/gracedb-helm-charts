@@ -57,6 +57,7 @@ data:
   DJANGO_SUPERUSER_EMAIL: {{ .Values.gracedb.djangoSuperuserEmail }}
   DJANGO_SENTRY_ENVIRONMENT: {{ .Values.tier.sentryEnvironment | default "generic-test" }}
   DJANGO_ENABLE_LOCAL_REDIS: "false"
+  DJANGO_ENABLE_REDIS_QUEUE: "false"
   SMTP_HOST: dummy
   SMTP_USERNAME: dummy
   SMTP_PASSWORD: dummy
