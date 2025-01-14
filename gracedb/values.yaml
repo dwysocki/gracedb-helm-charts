@@ -70,7 +70,7 @@ gracedb:
   storage:
     capacity: 10Gi
   resources:
-    cpu: 2
+    cpu: 6
     memory: 8Gi
   # This is for Django admin user
   djangoSuperuserName: "admin"
