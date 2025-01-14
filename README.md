@@ -31,7 +31,7 @@ This is a simple Helm chart that deploys the Hop server as outlined in: https://
 | `image.repository` | Image name | "scimma/server"
 | `image.tag` | Image tag | "latest"
 | `image.pullPolicy` | Image pull policy | "IfNotPresent"
-| `service.type` | Service type | "NodePort"
+| `service.type` | Service type | "ClusterIP"
 | `externalIP` | Only for LoadBalancer service type | - 
 | `resources` | Resource limits and requests | {}
 
@@ -63,8 +63,8 @@ Topics are automatically created via a Kubernetes Job, which starts after the se
 |`supportContact`| Email of the support contact that will appear in the main page | string | "albert.einstein@ligo.org"
 |`gracedb.image`| The GraceDB container image to be used | string | "containers.ligo.org/computing/gracedb/server:gracedb-2.27.0"
 |`gracedb.storage.capacity`| The storage capacity to be allocated for the GraceDB data PVC | string | "10Gi"
-|`gracedb.resources.cpu`| The number of CPUs to allocate for the GraceDB pod | number | 4 
-|`gracedb.resources.memory`| The amount of memory to allocate for the GraceDB pod | string | "5Gi"
+|`gracedb.resources.cpu`| The number of CPUs to allocate for the GraceDB pod | number | 6 
+|`gracedb.resources.memory`| The amount of memory to allocate for the GraceDB pod | string | "8Gi"
 |`gracedb.djangoSuperuserName`| The name of the Django superuser (will be created if not already present) | string | "admin"
 |`gracedb.djangoSuperuserEmail`| The email of the Django superuser | string | "albert.einstein@ligo.org"
 |`gracedb.igwnAlertAuth`| Enable authenticated connections to the Hopskotch server | boolean | false
