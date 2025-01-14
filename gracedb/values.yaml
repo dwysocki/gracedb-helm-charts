@@ -66,7 +66,7 @@ tier:
   supportContact: "albert.einstein@ligo.org"
 
 gracedb:
-  image: "containers.ligo.org/computing/gracedb/server:gracedb-2.29.0"
+  image: "containers.ligo.org/computing/gracedb/server:gracedb-2.31.0"
   storage:
     capacity: 10Gi
   resources:
