@@ -4,20 +4,16 @@ kind: Service
 metadata:
   name: {{ include "gracedb.fullname" . }}
 spec:
-  type: NodePort
+  type: ClusterIP
   ports:
   - name: http
     port: 80
-    targetPort: 80
   - name: p1
     port: 8080
-    targetPort: 8080
   - name: p2
     port: 8001
-    targetPort: 8001
   - name: postgres
     port: 5432
-    targetPort: 5432
   selector:
     app: {{ include "gracedb.fullname" . }}
 ---
@@ -30,14 +26,12 @@ metadata:
     traefik.ingress.kubernetes.io/affinity: "true"
     traefik.ingress.kubernetes.io/session-cookie-name: "shibd-backend"
 spec:
-  type: NodePort
+  type: ClusterIP
   ports:
   - name: http
     port: 80
-    targetPort: 80
   - name: p1
     port: 8080
-    targetPort: 8080
   selector:
     app: {{ include "gracedb.fullname" . }}-shibd
 {{ end }}
