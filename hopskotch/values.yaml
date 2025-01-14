@@ -15,7 +15,6 @@ image:
   tag: "0.7"
 
 service:
-  type: LoadBalancer
-  externalIP: 192.168.49.2
+  type: ClusterIP
 
 resources: {}
