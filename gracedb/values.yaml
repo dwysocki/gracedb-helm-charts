@@ -74,8 +74,9 @@ gracedb:
     memory: 8Gi
 
   gunicorn:
-    worker: 12
+    worker: 13
     threads: 1
+
   # Number of gunicorn workers
   # 2*CPU + 1 (recommendation from Gunicorn documentation)
   # NOTE: it was found in extensive testing that threads > 1 are prone
