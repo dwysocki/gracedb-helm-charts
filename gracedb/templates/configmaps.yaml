@@ -58,6 +58,8 @@ data:
   DJANGO_SENTRY_ENVIRONMENT: {{ .Values.tier.sentryEnvironment | default "generic-test" }}
   DJANGO_ENABLE_LOCAL_REDIS: "false"
   DJANGO_ENABLE_REDIS_QUEUE: "false"
+  GUNICORN_WORKERS: "{{ .Values.gracedb.gunicorn.worker }}"
+  GUNICORN_THREADS: "{{ .Values.gracedb.gunicorn.threads | default 1 }}"
   SMTP_HOST: dummy
   SMTP_USERNAME: dummy
   SMTP_PASSWORD: dummy

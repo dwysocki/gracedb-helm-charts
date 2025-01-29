@@ -196,6 +196,22 @@
                             "type": "string",
                             "description": "The amount of memory to allocate for the GraceDB pod"
                         }
+                    }},
+                "gunicorn": {
+                    "type": "object",
+                    "required": [
+                        "worker",
+                        "threads"
+                    ],
+                    "properties": {
+                        "worker": {
+                            "type": "number",
+                            "description": "The number of gunicorn workers"
+                        },
+                        "threads": {
+                            "type": "number",
+                            "description": "The number of threads for gunicorn worker"
+                        }
                     }
                 },
                 "djangoSuperuserName": {

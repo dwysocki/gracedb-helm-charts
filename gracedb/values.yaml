@@ -72,6 +72,18 @@ gracedb:
   resources:
     cpu: 6
     memory: 8Gi
+
+  gunicorn:
+    worker: 13
+    threads: 1
+
+  # Number of gunicorn workers
+  # 2*CPU + 1 (recommendation from Gunicorn documentation)
+  # NOTE: it was found in extensive testing that threads > 1 are prone
+  # GUNICORN_WORKERS = {{ .Values.gracedb.gunicorn.worker }}
+  # GUNICORN_THREADS = {{ .Values.gracedb.gunicorn.threads | default 1 }}
+
+
   # This is for Django admin user
   djangoSuperuserName: "admin"
   djangoSuperuserEmail: "albert.einstein@ligo.org"
