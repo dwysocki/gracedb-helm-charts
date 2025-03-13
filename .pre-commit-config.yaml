@@ -1,0 +1,10 @@
+---
+repos:
+  - repo: https://github.com/gitleaks/gitleaks
+    rev: v8.24.0
+    hooks:
+      - id: gitleaks
+  - repo: https://github.com/gruntwork-io/pre-commit
+    rev: v0.1.26
+    hooks:
+      - id: helmlint

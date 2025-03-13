@@ -20,6 +20,13 @@ spec:
             cp /root/create-topics.sh .
             chmod +x create-topics.sh 
             ./create-topics.sh {{ .Release.Namespace }} {{ include "hopskotch.fullname" . }}
+        resources:
+          limits:
+            cpu: "2000m"
+            memory: "1G"
+          requests:
+            cpu: "100m"
+            memory: "200Mi"
         volumeMounts:
           - name: create-topics-script
             mountPath: /root/create-topics.sh
@@ -36,4 +43,3 @@ spec:
           name: topics-list
       restartPolicy: Never
   backoffLimit: 10
-

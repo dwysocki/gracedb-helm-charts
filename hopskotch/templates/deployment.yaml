@@ -31,15 +31,15 @@ spec:
           livenessProbe:
             exec:
               command: ["kcat","-L","-b","localhost:9092"]
-            initialDelaySeconds: 5
+            initialDelaySeconds: 15
             periodSeconds: 120 
           readinessProbe:
             exec:
               command: ["kcat","-L","-b","localhost:9092"]
-            initialDelaySeconds: 5
+            initialDelaySeconds: 15
             periodSeconds: 5
           resources:
-            {{- toYaml .Values.resources | nindent 12 | default "{}" }}
+                {{- toYaml .Values.resources | nindent 12 | default "{}" }}
           volumeMounts:
           - name: data-dir
             mountPath: /var/lib/zookeeper
