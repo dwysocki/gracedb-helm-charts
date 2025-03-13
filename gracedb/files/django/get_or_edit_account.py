@@ -82,4 +82,3 @@ class Command(BaseCommand):
             #        perm = Permission.objects.get(codename=perm_codename)
             #        user_processor.user.user_permissions.add(perm)
             user_processor.user.save()
-

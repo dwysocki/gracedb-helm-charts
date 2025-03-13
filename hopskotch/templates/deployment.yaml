@@ -1,3 +1,4 @@
+---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -32,7 +33,7 @@ spec:
             exec:
               command: ["kcat","-L","-b","localhost:9092"]
             initialDelaySeconds: 15
-            periodSeconds: 120 
+            periodSeconds: 120
           readinessProbe:
             exec:
               command: ["kcat","-L","-b","localhost:9092"]
@@ -46,4 +47,4 @@ spec:
       volumes:
         - name: data-dir
           persistentVolumeClaim:
-            claimName: {{ include "hopskotch.fullname" . }}-persistence   
+            claimName: {{ include "hopskotch.fullname" . }}-persistence

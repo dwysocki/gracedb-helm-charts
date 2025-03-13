@@ -1,3 +1,4 @@
+---
 apiVersion: batch/v1
 kind: Job
 metadata:
@@ -13,12 +14,12 @@ spec:
       - name: create-topics
         image: "{{ .Values.image.repository | default "scimma/server" }}:{{ .Values.image.tag | default "latest" }}"
         imagePullPolicy: {{ .Values.image.pullPolicy | default "IfNotPresent" }}
-        command: 
+        command:
           - sh
           - -c
           - |
             cp /root/create-topics.sh .
-            chmod +x create-topics.sh 
+            chmod +x create-topics.sh
             ./create-topics.sh {{ .Release.Namespace }} {{ include "hopskotch.fullname" . }}
         resources:
           limits:

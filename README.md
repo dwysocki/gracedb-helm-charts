@@ -1,6 +1,6 @@
 # GraceDB Helm Charts
 
-This repository contains the Helm charts to deploy GraceDB and the Hopskotch server on a Kubernetes cluster. Default values of both charts allow for a sandboxed deployment on Minikube. 
+This repository contains the Helm charts to deploy GraceDB and the Hopskotch server on a Kubernetes cluster. Default values of both charts allow for a sandboxed deployment on Minikube.
 
 The package registry of this project can be used as Helm repository:
 
@@ -32,17 +32,28 @@ This is a simple Helm chart that deploys the Hop server as outlined in: https://
 | `image.tag` | Image tag | "latest"
 | `image.pullPolicy` | Image pull policy | "IfNotPresent"
 | `service.type` | Service type | "ClusterIP"
-| `externalIP` | Only for LoadBalancer service type | - 
+| `externalIP` | Only for LoadBalancer service type | -
 | `resources` | Resource limits and requests | {}
+
+example values file for deployment in Nautilus:
+```yaml
+resources: { "limits": { "cpu": "2000m", "memory": "8G" }, "requests": { "cpu": "100m", "memory": "500Mi" } }
+
+storageClassName: rook-cephfs
+storageCapacity: 1Gi
+
+service:
+  type: ClusterIP
+```
 
 ### Topic creation
 Topics are automatically created via a Kubernetes Job, which starts after the server deployment is completed.
 
-## GraceDB chart 
+## GraceDB chart
 ### Configuration
 
 | Name | Description | Type | Default value |
-| --- |--- | --- | ----- | 
+| --- |--- | --- | ----- |
 |`traefik.install`| Install Traefik | boolean | true
 | `cert_manager.enabled`| Enable automatic creation of TLS certificates using cert-manager.io operator | boolean | true
 |`cert_manager.install`| Install the cert-manager.io operator | boolean | true
@@ -63,7 +74,7 @@ Topics are automatically created via a Kubernetes Job, which starts after the se
 |`supportContact`| Email of the support contact that will appear in the main page | string | "albert.einstein@ligo.org"
 |`gracedb.image`| The GraceDB container image to be used | string | "containers.ligo.org/computing/gracedb/server:gracedb-2.31.0"
 |`gracedb.storage.capacity`| The storage capacity to be allocated for the GraceDB data PVC | string | "10Gi"
-|`gracedb.resources.cpu`| The number of CPUs to allocate for the GraceDB pod | number | 6 
+|`gracedb.resources.cpu`| The number of CPUs to allocate for the GraceDB pod | number | 6
 |`gracedb.resources.memory`| The amount of memory to allocate for the GraceDB pod | string | "8Gi"
 |`gracedb.djangoSuperuserName`| The name of the Django superuser (will be created if not already present) | string | "admin"
 |`gracedb.djangoSuperuserEmail`| The email of the Django superuser | string | "albert.einstein@ligo.org"
@@ -77,7 +88,7 @@ Topics are automatically created via a Kubernetes Job, which starts after the se
 |`secrets.djangoSuperuserPassword`| The password for the automatically created Django superuser | string | "mypassword"
 |`secrets.dbPassword`| The password for GraceDB's postgreSQL database | string | "dbpassword"
 |`secrets.igwnAlertUsername`| Username for the IGWN-alert broker (only used if gracedb.igwnAlertAuth is true) | string | -
-|`secrets.igwnAlertPassword`| Password for the IGWN-alert broker (only used if gracedb.igwnAlertAuth is true) | string | - 
+|`secrets.igwnAlertPassword`| Password for the IGWN-alert broker (only used if gracedb.igwnAlertAuth is true) | string | -
 |`secrets.shibbolethCert`| The x509 certificate to be used for Shibboleth | string | -
 |`secrets.shibbolethPKey`| The x509 private key to be used for Shibboleth | string | -
 |`postgres.image`| The PostgreSQL container image to be used (for non replicated deployments) | string | "postgres:16.2"
@@ -163,6 +174,26 @@ postgresql:
         memory: 1Gi
 ```
 
+
+## Pre-commit
+optional sanity checks before accepting the actual commit in the repository:
+- check for secrets
+- lint manifests with helm lint
+
+### install precommit:
+- install precommit package
+| package manager | package name |
+----------------------------------
+| pip             | pre-commit   |
+| apt             | pre-commit   |
+| dnf/yum         | pre-commit   |
+
+- install precommit in the local clone
+    ```shell
+    precommit install
+    precommit install-hooks
+    ```
+
+
 ## CI pipeline
 This repository's CI pipeline builds and uploads the Helm charts to the the package registry whenever a new tag is created.
-

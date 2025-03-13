@@ -41,4 +41,3 @@ class Command(BaseCommand):
             # Delete event, removing data, subclasses, and GroupObjectPermissions
             # for the event and its subclasses
             event.delete(purge=True)
-

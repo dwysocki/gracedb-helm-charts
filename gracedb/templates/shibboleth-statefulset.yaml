@@ -57,7 +57,7 @@ spec:
               {{ end }}
           volumeMounts:
             - name: django-settings
-              mountPath: /app/gracedb_project/config/settings/container/generic-test.py 
+              mountPath: /app/gracedb_project/config/settings/container/generic-test.py
               subPath: generic-test.py
             - name: shibd-cache
               mountPath: "/var/cache/shibboleth"
