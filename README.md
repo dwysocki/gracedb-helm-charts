@@ -180,20 +180,42 @@ optional sanity checks before accepting the actual commit in the repository:
 - check for secrets
 - lint manifests with helm lint
 
-### install precommit:
-- install precommit package
-| package manager | package name |
-----------------------------------
-| pip             | pre-commit   |
-| apt             | pre-commit   |
-| dnf/yum         | pre-commit   |
+### install and configure pre-commit on developement system
+- install pre-commit package
+  
+  | package manager | package name |
+  |-----------------|--------------|
+  | pip             | pre-commit   |
+  | apt             | pre-commit   |
+  | brew            | pre-commit   |
+  
+- make sure helm is installed also to successfully run the `helmlint` check
 
 - install precommit in the local clone
-    ```shell
-    precommit install
-    precommit install-hooks
-    ```
+  ```shell
+  pre-commit install
+  pre-commit install-hooks
+  ```
+  
+### use pre-commit
 
+- pre-commit runs every time git commit is run
+
+- to commit without running git hooks:
+  ```shell
+  git commit --no-verify -m "skip pre-commit hook" -a
+  ```
+- manually run a pre-commit check manually:
+  ```shell
+  pre-commit run <check name> [ --files <list of files> | --all-files ] 
+  ```
+  
+### disable pre-commit
+  ```shell
+  pre-commit uninstall
+  ```
 
 ## CI pipeline
 This repository's CI pipeline builds and uploads the Helm charts to the the package registry whenever a new tag is created.
+
+Uploads to the repository in response to the creation of a tag.
