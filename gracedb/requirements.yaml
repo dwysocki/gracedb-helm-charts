@@ -14,7 +14,7 @@ dependencies:
   alias: cert-manager
   condition: cert_manager.install
 - name: traefik
-  version: 27.0.2
+  version: 35.0.0
   repository: https://traefik.github.io/charts
   alias: traefik
   condition: traefik.install
