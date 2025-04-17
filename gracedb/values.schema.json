@@ -24,7 +24,7 @@
                 }
             }
 
-        }, 
+        },
         "cert_manager": {
             "type": "object",
             "description": "cert-manager.io support configuration",
@@ -224,15 +224,15 @@
                 },
                 "igwnAlertAuth": {
                     "type": "boolean",
-                    "description": "Enable authenticated connections to the Hopskotch server." 
+                    "description": "Enable authenticated connections to the Hopskotch server."
                 },
                 "igwnAlertServer": {
                     "type": "string",
-                    "description": "DNS name of the Hopskotch server." 
+                    "description": "DNS name of the Hopskotch server."
                 },
                 "igwnAlertGroup": {
-                    "type": "string", 
-                    "description": " Prefix for Kafka topics." 
+                    "type": "string",
+                    "description": " Prefix for Kafka topics."
                 },
                 "replicaCount": {
                     "type": "integer",
@@ -301,11 +301,11 @@
                         },
                         "memory": {
                             "description": "The amount of memory to allocate for the PostgreSQL pod",
-                            "type": "string" 
-                        }      
+                            "type": "string"
+                        }
                     }
                 }
-            } 
+            }
         }
     }
 }

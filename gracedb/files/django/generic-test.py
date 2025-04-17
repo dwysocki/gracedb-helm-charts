@@ -88,7 +88,7 @@ INSTANCE_INFO = """
 <p>
 This GraceDB instance is designed for Quality Assurance (QA) testing and
 validation for GraceDB and electromagnetic follow-up (EMFollow) developers.
-Software should meet QA milestones on the test instance before being moved 
+Software should meet QA milestones on the test instance before being moved
 to Playground or Production. Note, on this GraceDB instance:
 </p>
 <ul>
@@ -96,10 +96,10 @@ to Playground or Production. Note, on this GraceDB instance:
 <li>Only LIGO logins are provided (no login via InCommon or Google).</li>
 </ul>
 """.format(INSTANCE_LIST)
- 
+
 # This is for simple username/password authentication
 # needed by the sandboxed deployment (e.g. on Minikube)
-SANDBOXED = parse_envvar_bool( 
+SANDBOXED = parse_envvar_bool(
     get_from_env('ENABLE_SANDBOXED',
                  fail_if_not_found=False, default_value="false")
 )

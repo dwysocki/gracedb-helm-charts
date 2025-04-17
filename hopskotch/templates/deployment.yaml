@@ -1,3 +1,4 @@
+---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -31,19 +32,19 @@ spec:
           livenessProbe:
             exec:
               command: ["kcat","-L","-b","localhost:9092"]
-            initialDelaySeconds: 5
-            periodSeconds: 120 
+            initialDelaySeconds: 15
+            periodSeconds: 120
           readinessProbe:
             exec:
               command: ["kcat","-L","-b","localhost:9092"]
-            initialDelaySeconds: 5
+            initialDelaySeconds: 15
             periodSeconds: 5
           resources:
-            {{- toYaml .Values.resources | nindent 12 | default "{}" }}
+                {{- toYaml .Values.resources | nindent 12 | default "{}" }}
           volumeMounts:
           - name: data-dir
             mountPath: /var/lib/zookeeper
       volumes:
         - name: data-dir
           persistentVolumeClaim:
-            claimName: {{ include "hopskotch.fullname" . }}-persistence   
+            claimName: {{ include "hopskotch.fullname" . }}-persistence

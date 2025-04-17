@@ -202,7 +202,7 @@ class IGWNAOverseerProtocol(LineReceiver):
             self.badRequest('topic name missing')
             return
 
-        # Interpret the node_name as a string, or a list of strings. 
+        # Interpret the node_name as a string, or a list of strings.
         try:
             if isinstance(topics, str): topics=[topics]
         except Exception as e:
@@ -223,18 +223,18 @@ class IGWNAOverseerProtocol(LineReceiver):
         if action == 'push':
             # Push the message into the list with a timestamp
             # FIXME: disabling for now. push this to a database of some point.
-            # The issue is, when running across nodes, this list gets populated 
+            # The issue is, when running across nodes, this list gets populated
             # but there's no guarantee that a message will land on the same node
-            # that it's sent from. 
+            # that it's sent from.
 
             #self.factory.outstanding_messages.update({
             #    message_id: datetime.now() })
             # Send the message:
 
-            for topic in topics: 
+            for topic in topics:
                 try:
                 # Loop over topics and send the message:
-                    # Construct a unique message ID 
+                    # Construct a unique message ID
                     message_id = sha1((topic + message).encode('utf-8')).hexdigest()
 
                     # Increment the message count for this topic for flushing:
@@ -247,14 +247,14 @@ class IGWNAOverseerProtocol(LineReceiver):
                     self.factory.client.publish_to_topic(topic, message)
                     ovrseer_logger.info("sent %s to topic %s" % (message_id, topic))
 
-                    # If necessary, flush the session for the given topic. 
+                    # If necessary, flush the session for the given topic.
                     if (options.flush_queue and
 			not self.factory.message_counter[topic] % options.flush_interval):
                         ovrseer_logger.info(f"flushing session for topic {topic}")
                         self.factory.client.flush_by_topic(topic)
                 except Exception as e:
                     ovrseer_logger.error("SEND FAILED: %s" % str(e))
-    
+
             self.transport.write(str.encode(json.dumps({'success': True})))
             self.transport.loseConnection()
 
@@ -365,7 +365,7 @@ if __name__ == '__main__':
     igwn_alert_thread = IGWNAlertThread(igwn_alert_client)
     igwn_alert_thread.start()
 
-    # Start the twisted server. This will listen for new data to transmit 
+    # Start the twisted server. This will listen for new data to transmit
     # to the kafka broker
     f = IGWNAOverseerFactory(igwn_alert_client, igwn_alert_thread)
 
@@ -385,4 +385,3 @@ if __name__ == '__main__':
 
     ovrseer_logger.info("starting the overseer reactor...")
     reactor.run()
-

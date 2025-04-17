@@ -95,7 +95,7 @@ gracedb:
   #replicaCount: 3
   #pvcName: ""
 
-# If disabled, secrtes should be created 
+# If disabled, secrtes should be created
 # before installing the chart
 secrets:
   enabled: true
@@ -165,4 +165,3 @@ memcached:
     limits:
       cpu: 0.1
       memory: 100Mi
-

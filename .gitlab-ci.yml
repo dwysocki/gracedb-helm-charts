@@ -10,9 +10,9 @@ variables:
 # if the chart is modified
 .helm:lint:
   stage: build
-  image: 
+  image:
     name: alpine/helm:${HELM_IMAGE_TAG}
-    entrypoint: [""] 
+    entrypoint: [""]
   script:
     - helm lint ${CHART_DIRECTORY}
   rules:
@@ -37,9 +37,9 @@ helm:lint:gracedb:
 # only when a tag is created
 .helm:build:
   stage: build
-  image: 
+  image:
     name: alpine/helm:${HELM_IMAGE_TAG}
-    entrypoint: [""] 
+    entrypoint: [""]
   script:
     - helm package ${CHART_DIRECTORY} --version ${CI_COMMIT_TAG}
   artifacts:
@@ -67,7 +67,7 @@ helm:build:gracedb:
 
 .helm:publish:
   stage: publish
-  image: 
+  image:
     name: alpine/curl:latest
     entrypoint: [""]
   script:
