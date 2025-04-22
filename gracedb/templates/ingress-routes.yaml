@@ -1,4 +1,8 @@
+{{ if traefik.v3 }}
 apiVersion: traefik.io/v1alpha1
+{{ else }}
+apiVersion: traefik.containo.us/v1alpha1
+{{ end }} 
 kind: IngressRoute
 metadata:
   name: {{ include "gracedb.fullname" . }}
