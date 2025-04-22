@@ -2,14 +2,16 @@
 # please do not change them!
 
 traefik:
+  # This installs version 3
+  install: true
   # This shold be removed in the future
   # but the CNAF instance still needs version 2
-  v3: true
-  install: true
+  version2:
+    enabled: false
+    install: false 
   service:
     spec:
       clusterIP: 10.100.100.10
-
 
 cert_manager:
   # Enable CRD-based automatic in-cluster certificate generation using

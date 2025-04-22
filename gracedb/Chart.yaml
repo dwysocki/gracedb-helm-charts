@@ -18,12 +18,12 @@ dependencies:
   repository: https://charts.jetstack.io
   alias: cert-manager
   condition: cert_manager.install
-- name: traefik-v2
+- name: traefik
   version: 27.0.2
   repository: https://traefik.github.io/charts
   alias: traefik-v2
-  condition: traefik.install
-- name: traefik-v3
+  condition: traefik.version2.install
+- name: traefik
   version: 35.0.1
   repository: https://traefik.github.io/charts
   alias: traefik-v3
