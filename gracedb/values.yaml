@@ -170,3 +170,11 @@ memcached:
     limits:
       cpu: 0.1
       memory: 100Mi
+
+
+# Temporary for Traefik v2
+traefik-v2:
+  service:
+    spec:
+      clusterIP: 10.100.100.10
+

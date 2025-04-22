@@ -26,5 +26,5 @@ dependencies:
 - name: traefik
   version: 35.0.1
   repository: https://traefik.github.io/charts
-  alias: traefik-v3
+  alias: traefik
   condition: traefik.install
