@@ -131,7 +131,7 @@ spec:
             periodSeconds: {{ .Values.gracedb.livenessProbe.periodSeconds }}
             timeoutSeconds: {{ .Values.gracedb.livenessProbe.timeoutSeconds }}
             successThreshold: {{ .Values.gracedb.livenessProbe.successThreshold }}
-            terminationGracePeriodSeconds: {{ .Values.gracedb.livenessProbe.terminationGracePeriodSeconds }}  
+            terminationGracePeriodSeconds: {{ .Values.gracedb.livenessProbe.terminationGracePeriodSeconds }}
           readinessProbe:
             httpGet:
               path: /heartbeat/
@@ -139,12 +139,12 @@ spec:
               httpHeaders:
                 - name: Host
                   value: {{ include "gracedb.fullname" . }}
-	    failureThreshold: {{ .Values.gracedb.readinessProbe.failureThreshold }} 	
+            failureThreshold: {{ .Values.gracedb.readinessProbe.failureThreshold }}
             initialDelaySeconds: {{ .Values.gracedb.readinessProbe.initialDelaySeconds }}
             periodSeconds: {{ .Values.gracedb.readinessProbe.periodSeconds }}
             timeoutSeconds: {{ .Values.gracedb.readinessProbe.timeoutSeconds }}
-            successThreshold: {{ .Values.gracedb.readinessProbe.successThreshold }}
-	    terminationGracePeriodSeconds: {{ .Values.gracedb.readinessProbe.terminationGracePeriodSeconds }}
+            successThreshold: {{ .Values.gracedb.readinessProbe.successThreshold }} 
+            terminationGracePeriodSeconds: {{ .Values.gracedb.readinessProbe.terminationGracePeriodSeconds }}
 
       initContainers:
         - name: gracedb-init
