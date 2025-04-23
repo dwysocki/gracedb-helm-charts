@@ -131,7 +131,7 @@ spec:
             periodSeconds: {{ .Values.gracedb.livenessProbe.periodSeconds }}
             timeoutSeconds: {{ .Values.gracedb.livenessProbe.timeoutSeconds }}
             successThreshold: {{ .Values.gracedb.livenessProbe.successThreshold }}
-            terminationGracePeriodSeconds: {{ {{ .Values.gracedb.livenessProbe.terminationGracePeriodSeconds }}  
+            terminationGracePeriodSeconds: {{ .Values.gracedb.livenessProbe.terminationGracePeriodSeconds }}  
           readinessProbe:
             httpGet:
               path: /heartbeat/
