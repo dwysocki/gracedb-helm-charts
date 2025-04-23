@@ -233,6 +233,18 @@
                         "periodSeconds": {
                             "type": "number",
                             "description": "Time interval between probes"
+                        },
+                        "timeoutSeconds": {
+                            "type": "number",
+                            "description": "Probe timeout"
+                        },
+                        "successThreshold": {
+                            "type": "number",
+                            "description": "Minimum consecutive successes for the probe to be considered successful"
+                        },
+                        "terminationGracePeriodSeconds": {
+                            "type": "number",
+                            "description": "Grace period to wait before triggering a shut down"
                         }
                     }
 		},
@@ -250,6 +262,22 @@
                         "periodSeconds": {
                             "type": "number",
                             "description": "Time interval between probes"
+                        },
+                        "timeoutSeconds": {
+                            "type": "number",
+                            "description": "Probe timeout"
+                        },
+                        "successThreshold": {
+                            "type": "number",
+                            "description": "Minimum consecutive successes for the probe to be considered successful"
+                        },
+                        "failureThreshold": {
+                            "type": "number",
+                            "description": "Number of probe failures before Pod restart"
+                        },
+                        "terminationGracePeriodSeconds": {
+                            "type": "number",
+                            "description": "Grace period to wait before triggering a shut down"
                         }
                     }
 		},

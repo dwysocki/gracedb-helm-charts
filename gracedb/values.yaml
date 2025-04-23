@@ -87,11 +87,18 @@ gracedb:
     failureThreshold: 2
     initialDelaySeconds: 1000
     periodSeconds: 10 
+    timeoutSeconds: 1
+    successThreshold: 1 
+    terminationGracePeriodSeconds: 30
 
   # Readiness probe
   readinessProbe:
+    failureThreshold: 3
     initialDelaySeconds: 5
     periodSeconds: 5
+    timeoutSeconds: 1
+    successThreshold: 1 
+    terminationGracePeriodSeconds: 30
 
   # Number of gunicorn workers
   # 2*CPU + 1 (recommendation from Gunicorn documentation)
