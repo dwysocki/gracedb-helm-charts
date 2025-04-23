@@ -87,7 +87,7 @@ gracedb:
     failureThreshold: 2
     initialDelaySeconds: 1000
     periodSeconds: 10 
-    timeoutSeconds: 1
+    timeoutSeconds: 3
     successThreshold: 1 
     terminationGracePeriodSeconds: 30
 
@@ -96,7 +96,7 @@ gracedb:
     failureThreshold: 3
     initialDelaySeconds: 5
     periodSeconds: 5
-    timeoutSeconds: 1
+    timeoutSeconds: 3
     successThreshold: 1 
     terminationGracePeriodSeconds: 30
 
