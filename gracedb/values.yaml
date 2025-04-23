@@ -82,6 +82,17 @@ gracedb:
     worker: 13
     threads: 1
 
+  # Liveness probe
+  livenessProbe:
+    failureThreshold: 2
+    initialDelaySeconds: 1000
+    periodSeconds: 10 
+
+  # Readiness probe
+  readinessProbe:
+    initialDelaySeconds: 5
+    periodSeconds: 5
+
   # Number of gunicorn workers
   # 2*CPU + 1 (recommendation from Gunicorn documentation)
   # NOTE: it was found in extensive testing that threads > 1 are prone

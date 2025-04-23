@@ -214,6 +214,45 @@
                         }
                     }
                 },
+                "livenessProbe": {
+                    "type": "object",
+                    "required": [
+                        "failureThreshold",
+                        "initialDelaySeconds",
+			"periodSeconds"
+                    ],
+                    "properties": {
+                        "failureThreshold": {
+                            "type": "number",
+                            "description": "Number of probe failures before Pod restart"
+                        },
+                        "initialDelaySeconds": {
+                            "type": "number",
+                            "description": "Wait time before first probe"
+                        },
+                        "periodSeconds": {
+                            "type": "number",
+                            "description": "Time interval between probes"
+                        }
+                    }
+		},
+                "readinessProbe": {
+                    "type": "object",
+                    "required": [
+                        "initialDelaySeconds",
+			"periodSeconds"
+                    ],
+                    "properties": {
+                        "initialDelaySeconds": {
+                            "type": "number",
+                            "description": "Wait time before first probe"
+                        },
+                        "periodSeconds": {
+                            "type": "number",
+                            "description": "Time interval between probes"
+                        }
+                    }
+		},
                 "djangoSuperuserName": {
                     "type": "string",
                     "description": "The name of the Django superuser (will be created if not already present)."
