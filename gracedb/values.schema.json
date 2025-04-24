@@ -214,6 +214,69 @@
                         }
                     }
                 },
+                "livenessProbe": {
+                    "type": "object",
+                    "required": [
+                        "failureThreshold",
+                        "initialDelaySeconds",
+			"periodSeconds"
+                    ],
+                    "properties": {
+                        "failureThreshold": {
+                            "type": "number",
+                            "description": "Number of probe failures before Pod restart"
+                        },
+                        "initialDelaySeconds": {
+                            "type": "number",
+                            "description": "Wait time before first probe"
+                        },
+                        "periodSeconds": {
+                            "type": "number",
+                            "description": "Time interval between probes"
+                        },
+                        "timeoutSeconds": {
+                            "type": "number",
+                            "description": "Probe timeout"
+                        },
+                        "successThreshold": {
+                            "type": "number",
+                            "description": "Minimum consecutive successes for the probe to be considered successful"
+                        },
+                        "terminationGracePeriodSeconds": {
+                            "type": "number",
+                            "description": "Grace period to wait before triggering a shut down"
+                        }
+                    }
+		},
+                "readinessProbe": {
+                    "type": "object",
+                    "required": [
+                        "initialDelaySeconds",
+			"periodSeconds"
+                    ],
+                    "properties": {
+                        "initialDelaySeconds": {
+                            "type": "number",
+                            "description": "Wait time before first probe"
+                        },
+                        "periodSeconds": {
+                            "type": "number",
+                            "description": "Time interval between probes"
+                        },
+                        "timeoutSeconds": {
+                            "type": "number",
+                            "description": "Probe timeout"
+                        },
+                        "successThreshold": {
+                            "type": "number",
+                            "description": "Minimum consecutive successes for the probe to be considered successful"
+                        },
+                        "failureThreshold": {
+                            "type": "number",
+                            "description": "Number of probe failures before Pod restart"
+                        }
+                    }
+		},
                 "djangoSuperuserName": {
                     "type": "string",
                     "description": "The name of the Django superuser (will be created if not already present)."
