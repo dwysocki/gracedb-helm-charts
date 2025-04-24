@@ -91,10 +91,10 @@ spec:
                   # First we check the status of shibboleth    
                   python3 /usr/local/bin/check_shibboleth_status &&
                   # Then that of GraceDB 
-                  curl -sf http://{{ include "gracedb.fullname" . }}:80/heartbeat/
-            failureThreshold: 3
-            initialDelaySeconds: 1000
-            periodSeconds: 50
+                  curl -f http://{{ include "gracedb.fullname" . }}:80/heartbeat/
+            failureThreshold: 5
+            initialDelaySeconds: 10
+            periodSeconds: 60
           readinessProbe:
             exec:
               command:
