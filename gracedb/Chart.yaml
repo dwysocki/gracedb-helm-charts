@@ -1,5 +1,30 @@
-apiVersion: v1
+apiVersion: v2
 name: gracedb
 version: 1.1.2
 appVersion: "2.31.0"
 description: A Helm chart for GraceDB
+dependencies:
+- name: memcached
+  version: 6.10.1
+  repository: oci://registry-1.docker.io/bitnamicharts
+  alias: memcached
+- name: postgresql
+  version: 14.0.5
+  repository: oci://registry-1.docker.io/bitnamicharts
+  alias: postgresql
+  condition: distributed.enabled
+- name: cert-manager
+  version: v1.16.2
+  repository: https://charts.jetstack.io
+  alias: cert-manager
+  condition: cert_manager.install
+- name: traefik
+  version: 27.0.2
+  repository: https://traefik.github.io/charts
+  alias: traefik-v2
+  condition: traefik.version2.install
+- name: traefik
+  version: 35.0.1
+  repository: https://traefik.github.io/charts
+  alias: traefik
+  condition: traefik.install

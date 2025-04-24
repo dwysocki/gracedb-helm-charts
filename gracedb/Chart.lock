@@ -1,20 +1,18 @@
 dependencies:
 - name: memcached
+  repository: oci://registry-1.docker.io/bitnamicharts
   version: 6.10.1
-  repository: oci://registry-1.docker.io/bitnamicharts
-  alias: memcached
 - name: postgresql
-  version: 14.0.5
   repository: oci://registry-1.docker.io/bitnamicharts
-  alias: postgresql
-  condition: distributed.enabled
+  version: 14.0.5
 - name: cert-manager
-  version: v1.16.2
   repository: https://charts.jetstack.io
-  alias: cert-manager
-  condition: cert_manager.install
+  version: v1.16.2
 - name: traefik
-  version: 35.0.0
   repository: https://traefik.github.io/charts
-  alias: traefik
-  condition: traefik.install
+  version: 27.0.2
+- name: traefik
+  repository: https://traefik.github.io/charts
+  version: 35.0.1
+digest: sha256:be4266069c36b02e0a9fc77c5714a277f7c41ed6835a33e22f4ae1942d156c20
+generated: "2025-04-22T15:50:59.201846+02:00"
