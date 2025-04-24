@@ -98,7 +98,6 @@ gracedb:
     periodSeconds: 5
     timeoutSeconds: 3
     successThreshold: 1 
-    terminationGracePeriodSeconds: 30
 
   # Number of gunicorn workers
   # 2*CPU + 1 (recommendation from Gunicorn documentation)

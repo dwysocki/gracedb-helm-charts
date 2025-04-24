@@ -274,10 +274,6 @@
                         "failureThreshold": {
                             "type": "number",
                             "description": "Number of probe failures before Pod restart"
-                        },
-                        "terminationGracePeriodSeconds": {
-                            "type": "number",
-                            "description": "Grace period to wait before triggering a shut down"
                         }
                     }
 		},

@@ -144,7 +144,6 @@ spec:
             periodSeconds: {{ .Values.gracedb.readinessProbe.periodSeconds }}
             timeoutSeconds: {{ .Values.gracedb.readinessProbe.timeoutSeconds }}
             successThreshold: {{ .Values.gracedb.readinessProbe.successThreshold }} 
-            terminationGracePeriodSeconds: {{ .Values.gracedb.readinessProbe.terminationGracePeriodSeconds }}
 
       initContainers:
         - name: gracedb-init
