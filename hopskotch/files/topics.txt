@@ -34,6 +34,7 @@ cbc_pycbc_allsky
 cbc_pycbc_earlywarning
 cbc_pycbc_mdc
 cbc_pycbc_ssm
+cbc_sgnl
 cbc_spiir
 cbc_spiir_allsky
 cbc_spiir_earlywarning
@@ -97,6 +98,7 @@ test_mly_mdc
 test_pycbc
 test_pycbc_allsky
 test_pycbc_earlywarning
+test_sgnl
 test_snews
 test_snews_grb
 test_snews_subgrb
