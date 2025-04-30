@@ -75,11 +75,11 @@ gracedb:
   storage:
     capacity: 10Gi
   resources:
-    cpu: 6
-    memory: 8Gi
+    cpu: 2
+    memory: 4Gi
 
   gunicorn:
-    worker: 13
+    worker: 5
     threads: 1
 
   # Liveness probe
