@@ -85,18 +85,23 @@ spec:
           livenessProbe:
             exec:
               command:
-                - python3
-                - /usr/local/bin/check_shibboleth_status
-            failureThreshold: 2
-            initialDelaySeconds: 1000
-            periodSeconds: 10
+                - /bin/sh
+                - -c
+                - |
+                  # First we check the status of shibboleth    
+                  python3 /usr/local/bin/check_shibboleth_status &&
+                  # Then that of GraceDB 
+                  curl -f http://{{ include "gracedb.fullname" . }}:80/heartbeat/
+            failureThreshold: 5
+            initialDelaySeconds: 10
+            periodSeconds: 60
           readinessProbe:
             exec:
               command:
                 - python3
                 - /usr/local/bin/check_shibboleth_status
-            initialDelaySeconds: 5
-            periodSeconds: 5
+            initialDelaySeconds: 10
+            periodSeconds: 10
       initContainers:
         - name: shibd-init
           image: {{ .Values.gracedb.image }}
