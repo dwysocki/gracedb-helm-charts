@@ -179,6 +179,10 @@ cert-manager:
 #        memory: 1Gi
 
 memcached:
+  image:
+    repository: memcached
+    tag: 1.6
+    pullPolicy: IfNotPresent
   replicaCount: 1
   resources:
     requests:
@@ -194,4 +198,3 @@ traefik-v2:
   service:
     spec:
       clusterIP: 10.100.100.10
-

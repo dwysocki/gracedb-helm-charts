@@ -1,7 +1,4 @@
 dependencies:
-- name: memcached
-  repository: oci://registry-1.docker.io/bitnamicharts
-  version: 6.10.1
 - name: postgresql
   repository: oci://registry-1.docker.io/bitnamicharts
   version: 14.0.5
@@ -14,5 +11,5 @@ dependencies:
 - name: traefik
   repository: https://traefik.github.io/charts
   version: 35.0.1
-digest: sha256:be4266069c36b02e0a9fc77c5714a277f7c41ed6835a33e22f4ae1942d156c20
-generated: "2025-04-22T15:50:59.201846+02:00"
+digest: sha256:7a870e18ebc41b2af59970c0a9053ea4a8736222a24a7f340c8fd376a13cc0d9
+generated: "2025-10-17T11:20:51.316584+02:00"

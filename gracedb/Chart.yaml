@@ -4,10 +4,6 @@ version: 1.1.4
 appVersion: "2.31.1"
 description: A Helm chart for GraceDB
 dependencies:
-- name: memcached
-  version: 6.10.1
-  repository: oci://registry-1.docker.io/bitnamicharts
-  alias: memcached
 - name: postgresql
   version: 14.0.5
   repository: oci://registry-1.docker.io/bitnamicharts
