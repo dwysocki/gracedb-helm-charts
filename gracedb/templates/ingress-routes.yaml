@@ -1,3 +1,4 @@
+{{- if .Values.traefik.enabled }}
 {{ if .Values.traefik.version2.enabled }}
 apiVersion: traefik.containo.us/v1alpha1
 {{ else }}
@@ -46,3 +47,4 @@ spec:
     secretName: gracedb-cert-tls
     options:
       name: client-auth
+{{- end }}

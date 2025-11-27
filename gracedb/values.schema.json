@@ -15,9 +15,14 @@
         "traefik":{
             "type": "object",
             "required": [
+                "enabled",
                 "install"
             ],
             "properties": {
+                "enabled": {
+                    "type": "boolean",
+                    "description": "If *true* render Traefik resources (IngressRoute, TLS middleware, etc.). Set to *false* to disable them entirely."
+                },
                 "install": {
                     "type": "boolean",
                     "description": "If *true* install the Traefik Helm chart"
