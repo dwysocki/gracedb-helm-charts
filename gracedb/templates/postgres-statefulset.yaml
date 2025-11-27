@@ -75,7 +75,7 @@ spec:
               command:
               - sh
               - -c
-              - "pg_isready -U postgres --dbname=${POSTGRES_DB}"
+              - "pg_isready -U ${POSTGRES_USER} --dbname=${POSTGRES_DB}"
             initialDelaySeconds: 100
             periodSeconds: 20
             timeoutSeconds: 10
@@ -85,7 +85,7 @@ spec:
               command:
               - sh
               - -c
-              - "pg_isready -U postgres --dbname=${POSTGRES_DB}"
+              - "pg_isready -U ${POSTGRES_USER} --dbname=${POSTGRES_DB}"
             initialDelaySeconds: 10
             periodSeconds: 20
             timeoutSeconds: 10
