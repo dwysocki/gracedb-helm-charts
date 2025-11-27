@@ -54,6 +54,7 @@ Topics are automatically created via a Kubernetes Job, which starts after the se
 
 | Name | Description | Type | Default value |
 | --- |--- | --- | ----- |
+|`traefik.enabled`| Render Traefik-specific resources (IngressRoute, TLS) | boolean | true
 |`traefik.install`| Install Traefik | boolean | true
 | `cert_manager.enabled`| Enable automatic creation of TLS certificates using cert-manager.io operator | boolean | true
 |`cert_manager.install`| Install the cert-manager.io operator | boolean | true
@@ -120,11 +121,13 @@ Chart: https://artifacthub.io/packages/helm/traefik/traefik
 The applied configuration for this chart is the following:
 ```
 traefik:
+  enabled: true
   install: true
   service:
     spec:
       clusterIP: 10.100.100.10
 ```
+Set `traefik.enabled: false` to skip rendering the Traefik IngressRoute and TLS resources entirely (useful when another ingress controller is managed outside this chart).
 
 #### cert-manager (optional)
 Chart: https://artifacthub.io/packages/helm/cert-manager/cert-manager.
