@@ -1,0 +1,102 @@
+# Local k3d development overrides.
+# Deploy with:
+#   helm upgrade --install gracedb . \
+#     --values values.yaml --values values-k3d.yaml \
+#     --create-namespace --namespace gracedb --wait
+
+# Disable Traefik (k3d cluster is created with --disable=traefik)
+traefik:
+  enabled: false
+  install: false
+  version2:
+    enabled: false
+    install: false
+
+# Disable cert-manager
+cert_manager:
+  enabled: false
+  install: false
+
+# Sandboxed mode disables Shibboleth and related config
+sandboxed:
+  enabled: true
+
+# Single-node postgres (built-in StatefulSet, not Bitnami subchart)
+distributed:
+  enabled: false
+
+# Disable IGWN/LVAlert message broker integration
+alerts:
+  igwn: false
+
+# k3d uses the local-path provisioner by default
+storageClassName: "local-path"
+
+# Accessible via kubectl port-forward
+publicName: localhost
+
+tier:
+  sentryEnvironment: "k3d-dev"
+  settingModule: "config.settings.container.dev"
+  supportContact: "dev@localhost"
+
+gracedb:
+  # Locally built image (imported via: k3d image import gracedb-server:dev)
+  image: "gracedb-server:dev"
+  storage:
+    capacity: 1Gi
+  resources:
+    cpu: 1
+    memory: 1Gi
+  gunicorn:
+    worker: 2
+    threads: 1
+  livenessProbe:
+    failureThreshold: 3
+    initialDelaySeconds: 120
+    periodSeconds: 15
+    timeoutSeconds: 5
+    successThreshold: 1
+    terminationGracePeriodSeconds: 30
+  readinessProbe:
+    failureThreshold: 3
+    initialDelaySeconds: 15
+    periodSeconds: 10
+    timeoutSeconds: 5
+    successThreshold: 1
+  djangoSuperuserName: "admin"
+  djangoSuperuserEmail: "admin@localhost"
+  igwnAlertAuth: false
+  igwnAlertServer: "dummy"
+  igwnAlertGroup: "default"
+
+secrets:
+  enabled: true
+  djangoSecretKey: "insecure-dev-only-do-not-use-in-prod"
+  djangoSuperuserPassword: "admin"
+  dbPassword: "gracedb"
+
+database:
+  name: gracedb
+  user: gracedb
+  storageCapacity: 2Gi
+
+postgres:
+  image: "postgres:16.2"
+  resources:
+    cpu: 0.25
+    memory: 256Mi
+
+memcached:
+  image:
+    repository: memcached
+    tag: 1.6
+    pullPolicy: IfNotPresent
+  replicaCount: 1
+  resources:
+    requests:
+      cpu: 0.1
+      memory: 64Mi
+    limits:
+      cpu: 0.1
+      memory: 128Mi
