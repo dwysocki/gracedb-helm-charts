@@ -59,7 +59,25 @@ and the memory limits in `values-k3d.yaml` conservative. OOMKilled pods means
 tighten further.
 
 ## Conventions
-- This repo is a one-way mirror from git.ligo.org. Don't push to `main`.
-  Work on feature branches off `claude/setup-k3d-environment-A6RHo`.
+
+### Branch strategy
+`main` is a one-way mirror from git.ligo.org. Any commit pushed directly to
+`main` will be silently overwritten by the next mirror push from GitLab.
+
+Claude sessions **must not** target `main` for merges or direct pushes.
+
+Instead:
+1. Do all work on a short-lived feature branch (e.g. `claude/<topic>`).
+2. When the work is ready, merge the feature branch into **`claude-code`**.
+   `claude-code` is the durable integration branch that accumulates all
+   Claude-produced changes. It is never overwritten by the mirror.
+3. The maintainer periodically cherry-picks or pulls commits from `claude-code`
+   into the upstream GitLab repository.
+
+Summary: `claude/<topic>` → merge into `claude-code` → maintainer pulls to GitLab.
+Never merge into `main`.
+
+### Other conventions
 - `values-k3d.yaml` is Claude Code specific; it is safe to modify freely.
 - Don't modify `values.yaml` unless the change belongs in production too.
+- Keep commits small and descriptive — they will be cherry-picked to GitLab.
