@@ -61,21 +61,22 @@ tighten further.
 ## Conventions
 
 ### Branch strategy
-`main` is a one-way mirror from git.ligo.org. Any commit pushed directly to
-`main` will be silently overwritten by the next mirror push from GitLab.
+This repo is mirrored one-way from git.ligo.org. Mirror pushes overwrite any
+branch that also exists in the upstream GitLab repo. The only branches safe
+from overwrite are those that do not exist upstream.
 
-Claude sessions **must not** target `main` for merges or direct pushes.
+All Claude work **must** stay on branches prefixed with `claude/`. These
+branches are not present in the upstream GitLab repo and will never be
+clobbered by a mirror push.
 
-Instead:
-1. Do all work on a short-lived feature branch (e.g. `claude/<topic>`).
-2. When the work is ready, merge the feature branch into **`claude-code`**.
-   `claude-code` is the durable integration branch that accumulates all
-   Claude-produced changes. It is never overwritten by the mirror.
-3. The maintainer periodically cherry-picks or pulls commits from `claude-code`
-   into the upstream GitLab repository.
-
-Summary: `claude/<topic>` → merge into `claude-code` → maintainer pulls to GitLab.
-Never merge into `main`.
+- **Never push to, or open PRs targeting, any branch without a `claude/` prefix.**
+- Feature branches follow the pattern `claude/<workspace>`, where `<workspace>`
+  describes the task (e.g. `claude/fix-chart-resources`).
+- **At the start of each session, ask the user what workspace name to use.**
+  Claude will then work on `claude/<workspace>` for that session.
+- Completed feature branches are merged into a `claude/` integration branch
+  agreed with the maintainer (e.g. `claude/initial_claude_setup`). The
+  maintainer cherry-picks from there into the upstream GitLab repo.
 
 ### Other conventions
 - `values-k3d.yaml` is Claude Code specific; it is safe to modify freely.
