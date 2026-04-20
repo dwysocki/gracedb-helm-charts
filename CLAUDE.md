@@ -1,9 +1,10 @@
 # GraceDB Helm Charts — Notes for Claude Code
 
 ## Repository layout
+This repo is a GitHub mirror of `git.ligo.org/computing/gracedb/k8s/helm`.
 The GraceDB helm chart lives in the `gracedb/` subdirectory:
 ```
-gracedb-helm-charts/
+<this repo>/
 └── gracedb/          ← the chart (Chart.yaml, values.yaml, templates/, ...)
     ├── values.yaml       production defaults
     └── values-k3d.yaml   k3d dev overrides (committed here)
@@ -16,11 +17,11 @@ named `$K3D_CLUSTER_NAME` and writes kubeconfig to `$KUBECONFIG`.
 
 ```bash
 # 1. Build and import the server image (run from gracedb-server repo)
-(cd /workspace/gracedb-server && docker build -t gracedb-server:dev .)
+(cd ../gracedb-server && docker build -t gracedb-server:dev .)
 k3d image import gracedb-server:dev -c "$K3D_CLUSTER_NAME"
 
 # 2. Install / upgrade
-cd /workspace/gracedb-helm-charts/gracedb
+cd "$CLAUDE_PROJECT_DIR/gracedb"
 helm dependency update .
 helm upgrade --install gracedb . \
   --values values.yaml \
@@ -61,13 +62,12 @@ tighten further.
 ## Conventions
 
 ### Branch strategy
-This repo is mirrored one-way from git.ligo.org. Mirror pushes overwrite any
-branch that also exists in the upstream GitLab repo. The only branches safe
-from overwrite are those that do not exist upstream.
+This repo is mirrored one-way from `git.ligo.org/computing/gracedb/k8s/helm`.
+Mirror pushes overwrite any branch that also exists upstream. The only
+branches safe from overwrite are those that do not exist in that GitLab repo.
 
 All Claude work **must** stay on branches prefixed with `claude/`. These
-branches are not present in the upstream GitLab repo and will never be
-clobbered by a mirror push.
+branches are not present upstream and will never be clobbered by a mirror push.
 
 - **Never push to, or open PRs targeting, any branch without a `claude/` prefix.**
 - Feature branches follow the pattern `claude/<workspace>`, where `<workspace>`
