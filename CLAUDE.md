@@ -11,6 +11,24 @@ The GraceDB helm chart lives in the `gracedb/` subdirectory:
 ```
 All `helm` commands should be run from inside `gracedb/`.
 
+## Environment compatibility
+The Claude Code **web** environment (claude.ai/code) runs inside a **gVisor**
+sandbox. gVisor does not expose the kernel interfaces required by container
+orchestrators:
+
+| Requirement | gVisor status | Effect |
+|---|---|---|
+| iptables / nftables | unsupported | Docker daemon cannot start; k3d fails |
+| overlay filesystem | unsupported | containerd image layers fail |
+| cgroup rootfs (`/sys/fs/cgroup`) | not fully exposed | kubelet ContainerManager panics |
+
+k3d, k3s (direct), and Podman-backed Kubernetes all fail in this environment.
+The SessionStart hook in `gracedb-server` detects gVisor and skips the cluster
+step automatically, printing a clear warning.
+
+If you need the full Kubernetes stack, run Claude Code locally (CLI or IDE
+extension) on a Linux host with kernel ≥ 5.4 and Docker installed.
+
 ## Deploy to the local k3d cluster
 The sibling repo `gracedb-server`'s SessionStart hook creates a k3d cluster
 named `$K3D_CLUSTER_NAME` and writes kubeconfig to `$KUBECONFIG`.
